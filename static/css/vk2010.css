@@ -112,19 +112,30 @@ a:hover { text-decoration: underline; }
   max-width: 240px;
 }
 .topbar-player[hidden] { display: none; }
-.topbar-player .player-toggle {
-  width: 16px;
+.topbar-player .player-toggle,
+.topbar-player .player-prev,
+.topbar-player .player-next {
   height: 16px;
   background: linear-gradient(to bottom, #6E8DB0, #2B587A);
   border: 1px solid #1F4665;
   color: #fff;
-  font-size: 8px;
+  font-size: 7px;
   line-height: 1;
   cursor: pointer;
   padding: 0;
   flex-shrink: 0;
 }
-.topbar-player .player-toggle:hover { background: #2B587A; }
+.topbar-player .player-toggle { width: 16px; font-size: 8px; }
+.topbar-player .player-prev,
+.topbar-player .player-next { width: 18px; }
+.topbar-player .player-toggle:hover,
+.topbar-player .player-prev:hover,
+.topbar-player .player-next:hover { background: #2B587A; }
+.topbar-player .player-prev:disabled,
+.topbar-player .player-next:disabled {
+  color: #6E8DB0;
+  cursor: default;
+}
 .topbar-player .player-meta {
   flex: 1;
   min-width: 0;

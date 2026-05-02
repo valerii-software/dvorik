@@ -1,14 +1,17 @@
 /* VK 2010-style audio player.
  *
- * One global Audio() instance. Header player ("topbar-player") shows the
- * current track and survives HTMX-boosted navigation. Track rows on the
- * audio pages mirror the header state for the row whose data-src matches
- * the player's src.
+ * One global Audio() instance. Header player lives in the topbar and
+ * survives HTMX-boosted navigation. Track rows on the audio pages
+ * mirror the header state for the row whose data-src matches the
+ * player's src. A "playlist" snapshot is captured each time the user
+ * starts a new track from a list, enabling prev/next/auto-advance.
  */
 (function () {
   const audio = new Audio();
   audio.preload = 'none';
   let currentSrc = null;
+  let playlist = []; // [{src, artist, title}]
+  let currentIndex = -1;
 
   function $(id) { return document.getElementById(id); }
 
@@ -19,8 +22,16 @@
     return m + ':' + s;
   }
 
-  function visibleRowFor(src) {
-    return document.querySelector('.audio-row[data-src="' + CSS.escape(src) + '"]');
+  function escapeHTML(s) {
+    return (s || '').replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function rowsToTracks() {
+    return Array.from(document.querySelectorAll('.audio-row')).map(function (r) {
+      return { src: r.dataset.src, artist: r.dataset.artist, title: r.dataset.title };
+    });
   }
 
   function paintHeader() {
@@ -32,6 +43,8 @@
     }
     bar.hidden = false;
     $('player-toggle').textContent = audio.paused ? '▶' : '❚❚';
+    $('player-prev').disabled = currentIndex <= 0;
+    $('player-next').disabled = currentIndex < 0 || currentIndex >= playlist.length - 1;
     const dur = audio.duration || 0;
     $('player-progress-fill').style.width = (dur ? (audio.currentTime / dur) * 100 : 0) + '%';
     $('player-time').textContent = fmt(audio.currentTime) + (dur ? ' / ' + fmt(dur) : '');
@@ -66,10 +79,11 @@
     if (el) el.innerHTML = '<b>' + escapeHTML(artist) + '</b> — ' + escapeHTML(title);
   }
 
-  function escapeHTML(s) {
-    return (s || '').replace(/[&<>"']/g, function (c) {
-      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
-    });
+  function loadAndPlay(track) {
+    currentSrc = track.src;
+    audio.src = track.src;
+    setHeaderTitle(track.artist, track.title);
+    audio.play();
   }
 
   function playFromRow(row) {
@@ -78,10 +92,16 @@
       if (audio.paused) audio.play(); else audio.pause();
       return;
     }
-    currentSrc = src;
-    audio.src = src;
-    setHeaderTitle(row.dataset.artist, row.dataset.title);
-    audio.play();
+    // Snapshot the current page's tracks as the active playlist.
+    playlist = rowsToTracks();
+    currentIndex = playlist.findIndex(function (t) { return t.src === src; });
+    loadAndPlay(playlist[currentIndex]);
+  }
+
+  function gotoIndex(i) {
+    if (i < 0 || i >= playlist.length) return;
+    currentIndex = i;
+    loadAndPlay(playlist[i]);
   }
 
   function togglePause() {
@@ -94,6 +114,8 @@
     audio.removeAttribute('src');
     audio.load();
     currentSrc = null;
+    playlist = [];
+    currentIndex = -1;
     paint();
   }
 
@@ -102,8 +124,12 @@
   audio.addEventListener('pause', paint);
   audio.addEventListener('loadedmetadata', paint);
   audio.addEventListener('ended', function () {
-    audio.currentTime = 0;
-    paint();
+    if (currentIndex < playlist.length - 1) {
+      gotoIndex(currentIndex + 1);
+    } else {
+      audio.currentTime = 0;
+      paint();
+    }
   });
 
   document.addEventListener('click', function (e) {
@@ -113,14 +139,10 @@
       if (row) playFromRow(row);
       return;
     }
-    if (e.target.closest('#player-toggle')) {
-      togglePause();
-      return;
-    }
-    if (e.target.closest('#player-close')) {
-      close();
-      return;
-    }
+    if (e.target.closest('#player-toggle')) { togglePause(); return; }
+    if (e.target.closest('#player-prev'))   { gotoIndex(currentIndex - 1); return; }
+    if (e.target.closest('#player-next'))   { gotoIndex(currentIndex + 1); return; }
+    if (e.target.closest('#player-close'))  { close(); return; }
     const headerBar = e.target.closest('#player-progress');
     if (headerBar && audio.duration) {
       const r = headerBar.getBoundingClientRect();
@@ -137,9 +159,7 @@
     }
   });
 
-  // After HTMX swap (boost navigation), re-paint visible rows.
   document.body.addEventListener('htmx:afterSettle', paint);
-  // Also after first DOM ready.
   if (document.readyState !== 'loading') paint();
   else document.addEventListener('DOMContentLoaded', paint);
 })();
