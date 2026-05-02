@@ -1,14 +1,5 @@
 {% load wall_extras %}
-{% if group %}
-  {% url 'wall:posts_partial_group' group.id as poll_url %}
-{% else %}
-  {% url 'wall:posts_partial' owner.id as poll_url %}
-{% endif %}
-<div id="wall-posts"
-     hx-get="{{ poll_url }}"
-     hx-trigger="every 5s [document.visibilityState === 'visible']"
-     hx-swap="outerHTML"
-     hx-select="#wall-posts">
+<div id="wall-posts">
   {% if posts %}
     {% for p in posts %}
       {% include 'wall/_post.html' with p=p owner=owner %}
