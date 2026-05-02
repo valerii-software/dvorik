@@ -99,7 +99,8 @@ def graffiti(request, owner_id=None, group_id=None):
         save_url = '/wall/graffiti/save/group/' + str(group_id) + '/'
         cancel_url = redirect('groups:view', group_id=group_id).url
         title = 'Граффити в группу ' + target_group.name
-    return render(request, 'wall/graffiti.html', {
+    template = 'wall/_graffiti_inner.html' if request.headers.get('HX-Request') else 'wall/graffiti.html'
+    return render(request, template, {
         'title': title,
         'save_url': save_url,
         'cancel_url': cancel_url,

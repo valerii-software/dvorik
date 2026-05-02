@@ -86,5 +86,33 @@
 </div>
 {% endif %}
 
+<div id="modal-overlay" hx-preserve hidden>
+  <div class="modal-card">
+    <button type="button" class="modal-close" data-modal-close title="Закрыть">×</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const overlay = document.getElementById('modal-overlay');
+  const content = document.getElementById('modal-content');
+  function open() { overlay.hidden = false; }
+  function close() { overlay.hidden = true; content.innerHTML = ''; }
+  document.addEventListener('click', function (e) {
+    if (e.target === overlay || e.target.closest('[data-modal-close]')) {
+      e.preventDefault();
+      close();
+    }
+    if (e.target.closest('[data-modal-open]')) {
+      open();
+    }
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && !overlay.hidden) close();
+  });
+})();
+</script>
+
 </body>
 </html>

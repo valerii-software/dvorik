@@ -628,6 +628,40 @@ textarea { resize: vertical; }
 }
 .link-btn:hover { color: #b00; }
 
+/* ===== Modal ===== */
+#modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 30, 45, 0.55);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 50px;
+  z-index: 100;
+}
+#modal-overlay[hidden] { display: none; }
+.modal-card {
+  background: #fff;
+  border: 1px solid #2B587A;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  padding: 16px 18px 14px;
+  position: relative;
+  max-width: 640px;
+}
+.modal-close {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  background: none;
+  border: 0;
+  font-size: 16px;
+  line-height: 1;
+  color: #777;
+  cursor: pointer;
+  padding: 2px 6px;
+}
+.modal-close:hover { color: #000; }
+
 /* ===== Graffiti ===== */
 .graffiti-toolbar {
   display: flex;
