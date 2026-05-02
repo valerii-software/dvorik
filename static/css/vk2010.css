@@ -671,7 +671,7 @@ textarea { resize: vertical; }
   padding: 6px;
   background: #F4F7FA;
   border: 1px solid #DAE1E8;
-  width: 588px;
+  flex-wrap: wrap;
 }
 .graffiti-toolbar .palette,
 .graffiti-toolbar .brushes {
