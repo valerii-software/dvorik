@@ -35,6 +35,25 @@ def _redirect_to_target(wp):
 
 
 @login_required
+def posts_partial(request, owner_id):
+    """GET-only endpoint that returns the rendered #wall-posts block for
+    a user's wall. Used by HTMX polling to pick up new posts without a
+    full page refresh."""
+    owner = get_object_or_404(User, pk=owner_id)
+    if not can_view(request.user, owner, owner.profile.privacy_wall_view):
+        return render(request, 'wall/_posts.html', {'posts': [], 'owner': owner})
+    posts = WallPost.objects.filter(owner=owner).select_related('author', 'author__profile')
+    return render(request, 'wall/_posts.html', {'posts': posts, 'owner': owner})
+
+
+@login_required
+def posts_partial_group(request, group_id):
+    group = get_object_or_404(Group, pk=group_id)
+    posts = WallPost.objects.filter(group=group).select_related('author', 'author__profile')
+    return render(request, 'wall/_posts.html', {'posts': posts, 'group': group})
+
+
+@login_required
 @require_POST
 def post(request, owner_id):
     owner = get_object_or_404(User, pk=owner_id)
