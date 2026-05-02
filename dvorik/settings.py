@@ -24,7 +24,10 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
 
 # In production tighten the cookies. SECURE flags only kick in over HTTPS.
-if not DEBUG:
+# Set INSECURE_HTTP=1 to bypass them during a temporary HTTP-only deploy
+# (e.g. before HTTPS is wired up at the edge).
+INSECURE_HTTP = os.getenv('INSECURE_HTTP', '0') == '1'
+if not DEBUG and not INSECURE_HTTP:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_HSTS_SECONDS = 60 * 60 * 24 * 30  # 30 days, ramp up later
