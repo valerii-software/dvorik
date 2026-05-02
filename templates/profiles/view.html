@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load wall_extras %}
+{% block title %}{{ pageuser.get_full_name }} — ВКонтакте{% endblock %}
+
+{% block content %}
+<h1>{{ pageuser.get_full_name }}</h1>
+
+<div class="profile-grid">
+  <div class="profile-photo">
+    <img src="{{ profile.avatar_url }}" alt="">
+    <div class="profile-actions">
+      {% if is_me %}
+        <a href="{% url 'profiles:edit' %}">редактировать</a>
+      {% else %}
+        {% if friend_state == 'friends' %}
+          <span class="muted">Вы друзья</span>
+          {% include 'friends/_btn.html' with action='remove' label='удалить из друзей' uid=pageuser.id %}
+          <a href="{% url 'messaging:open' pageuser.id %}">написать сообщение</a>
+        {% elif friend_state == 'sent' %}
+          <span class="muted">Заявка отправлена</span>
+          {% include 'friends/_btn.html' with action='cancel' label='отменить заявку' uid=pageuser.id %}
+        {% elif friend_state == 'received' %}
+          {% include 'friends/_btn.html' with action='accept' label='принять заявку' uid=pageuser.id %}
+          {% include 'friends/_btn.html' with action='reject' label='отклонить' uid=pageuser.id %}
+        {% else %}
+          {% include 'friends/_btn.html' with action='add' label='добавить в друзья' uid=pageuser.id %}
+          <a href="{% url 'messaging:open' pageuser.id %}">написать сообщение</a>
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="profile-info">
+    <table>
+      {% if profile.gender %}<tr><td class="label">Пол:</td><td>{{ profile.get_gender_display }}</td></tr>{% endif %}
+      {% if profile.birth_date %}<tr><td class="label">День рождения:</td><td>{{ profile.birth_date|date:"j E Y" }}</td></tr>{% endif %}
+      {% if profile.marital_status %}<tr><td class="label">Сем. положение:</td><td>{{ profile.get_marital_status_display }}</td></tr>{% endif %}
+      {% if profile.home_city %}<tr><td class="label">Родной город:</td><td>{{ profile.home_city }}</td></tr>{% endif %}
+      {% if profile.languages %}<tr><td class="label">Языки:</td><td>{{ profile.languages }}</td></tr>{% endif %}
+      {% if profile.activity %}<tr><td class="label">Деятельность:</td><td>{{ profile.activity }}</td></tr>{% endif %}
+      {% if profile.skype %}<tr><td class="label">Skype:</td><td>{{ profile.skype }}</td></tr>{% endif %}
+      {% if profile.icq %}<tr><td class="label">ICQ:</td><td>{{ profile.icq }}</td></tr>{% endif %}
+      {% if profile.site %}<tr><td class="label">Сайт:</td><td>{{ profile.site }}</td></tr>{% endif %}
+    </table>
+
+    {% if profile.about %}<h2>О себе</h2><div>{{ profile.about|linebreaksbr }}</div>{% endif %}
+    {% if profile.interests %}<h2>Интересы</h2><div>{{ profile.interests|linebreaksbr }}</div>{% endif %}
+    {% if profile.favourite_music %}<h2>Любимая музыка</h2><div>{{ profile.favourite_music|linebreaksbr }}</div>{% endif %}
+    {% if profile.favourite_movies %}<h2>Любимые фильмы</h2><div>{{ profile.favourite_movies|linebreaksbr }}</div>{% endif %}
+    {% if profile.favourite_books %}<h2>Любимые книги</h2><div>{{ profile.favourite_books|linebreaksbr }}</div>{% endif %}
+    {% if profile.favourite_quotes %}<h2>Любимые цитаты</h2><div>{{ profile.favourite_quotes|linebreaksbr }}</div>{% endif %}
+  </div>
+</div>
+
+<h2>Друзья ({{ friend_count }})</h2>
+{% if friends_preview %}
+  <div class="friend-grid">
+    {% for f in friends_preview %}
+      <div class="friend-card">
+        <a href="{% url 'profiles:view' f.id %}"><img src="{{ f.profile.avatar_url }}" alt=""></a>
+        <a class="name" href="{% url 'profiles:view' f.id %}">{{ f.first_name }} {{ f.last_name }}</a>
+      </div>
+    {% endfor %}
+  </div>
+  <div style="margin-top:6px"><a href="{% url 'friends:user_friends' pageuser.id %}">Все друзья →</a></div>
+{% else %}
+  <div class="empty">Друзей пока нет.</div>
+{% endif %}
+
+<h2>Стена</h2>
+{% include 'wall/_wall.html' with posts=posts owner=pageuser wall_form=wall_form %}
+
+{% endblock %}

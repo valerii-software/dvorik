@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Мои настройки — ВКонтакте{% endblock %}
+
+{% block content %}
+<h1>Мои настройки</h1>
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {% for field in form %}
+    <div class="form-row">
+      <label>{{ field.label }}</label>
+      {{ field }}
+      {% if field.errors %}<div class="err">{{ field.errors|join:', ' }}</div>{% endif %}
+    </div>
+  {% endfor %}
+  <div class="form-row">
+    <label></label>
+    <button class="btn btn-primary" type="submit">Сохранить</button>
+    &nbsp;<a href="{% url 'profiles:my_page' %}">Отмена</a>
+  </div>
+</form>
+{% endblock %}

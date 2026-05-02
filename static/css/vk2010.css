@@ -1,0 +1,282 @@
+/* VK 2010 styles — Kashmir Blue #45668E, Tahoma 11px, white background */
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #EDEEF0;
+  font-family: Tahoma, Arial, sans-serif;
+  font-size: 11px;
+  color: #000;
+}
+
+a { color: #2B587A; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ===== Top bar ===== */
+.topbar {
+  background: #45668E;
+  height: 38px;
+  border-bottom: 1px solid #2B587A;
+}
+.topbar-inner {
+  width: 800px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+.topbar a.logo {
+  color: #fff;
+  font-size: 17px;
+  font-weight: bold;
+  letter-spacing: -0.5px;
+  text-decoration: none;
+}
+.topbar .topbar-search {
+  margin-left: auto;
+}
+.topbar .topbar-search input {
+  width: 220px;
+  padding: 3px 5px;
+  border: 1px solid #2B587A;
+  font: 11px Tahoma, Arial, sans-serif;
+}
+.topbar .topbar-user {
+  color: #fff;
+  margin-left: 14px;
+}
+.topbar .topbar-user a { color: #D6E2EC; }
+
+/* ===== Layout ===== */
+.layout {
+  width: 800px;
+  margin: 10px auto;
+  background: #fff;
+  border: 1px solid #B6C3D2;
+  display: flex;
+  min-height: 500px;
+}
+.sidebar {
+  width: 170px;
+  background: #F7F7F7;
+  border-right: 1px solid #DAE1E8;
+  padding: 10px 0;
+}
+.sidebar ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.sidebar li a {
+  display: block;
+  padding: 4px 10px 4px 14px;
+  color: #2B587A;
+}
+.sidebar li a.active,
+.sidebar li a:hover {
+  background: #E1E7ED;
+  text-decoration: none;
+  color: #000;
+}
+.sidebar .sidebar-title {
+  padding: 6px 10px 4px 14px;
+  color: #999;
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.content {
+  flex: 1;
+  padding: 14px 18px;
+  min-width: 0;
+}
+
+/* ===== Page chrome ===== */
+h1 {
+  font-size: 14px;
+  margin: 0 0 10px;
+  color: #000;
+  font-weight: bold;
+}
+h2 {
+  font-size: 12px;
+  margin: 14px 0 6px;
+  color: #2B587A;
+  border-bottom: 1px solid #DAE1E8;
+  padding-bottom: 2px;
+}
+.muted { color: #777; }
+.hr { border-top: 1px solid #DAE1E8; margin: 8px 0; }
+
+/* ===== Buttons & forms ===== */
+.btn {
+  display: inline-block;
+  padding: 3px 10px;
+  background: #ECECEC;
+  background: linear-gradient(to bottom, #FFFFFF, #E0E5EB);
+  border: 1px solid #ABB6C2;
+  color: #2B587A;
+  font: 11px Tahoma, Arial, sans-serif;
+  cursor: pointer;
+  text-decoration: none;
+}
+.btn:hover { background: #E5ECF3; text-decoration: none; }
+.btn-primary {
+  background: linear-gradient(to bottom, #6E8DB0, #45668E);
+  color: #fff;
+  border-color: #2B587A;
+}
+.btn-primary:hover { background: #45668E; color: #fff; }
+
+input[type="text"], input[type="email"], input[type="password"],
+input[type="date"], select, textarea {
+  font: 11px Tahoma, Arial, sans-serif;
+  border: 1px solid #ABB6C2;
+  padding: 3px 5px;
+  background: #fff;
+}
+textarea { resize: vertical; }
+
+.form-row { margin-bottom: 8px; }
+.form-row label {
+  display: inline-block;
+  width: 130px;
+  vertical-align: top;
+  color: #555;
+}
+.form-row .err { color: #b00; margin-left: 4px; }
+.form-error { color: #b00; margin-bottom: 8px; }
+
+/* ===== Profile ===== */
+.profile-grid { display: flex; gap: 14px; }
+.profile-photo {
+  width: 200px;
+  flex-shrink: 0;
+}
+.profile-photo img {
+  width: 200px;
+  border: 1px solid #ABB6C2;
+  display: block;
+}
+.profile-info { flex: 1; }
+.profile-info table { border-collapse: collapse; width: 100%; }
+.profile-info td { padding: 2px 6px 2px 0; vertical-align: top; }
+.profile-info td.label { color: #777; width: 130px; }
+
+.profile-actions { margin-top: 6px; }
+.profile-actions a { display: block; margin-bottom: 3px; }
+
+/* ===== Friend list ===== */
+.friend-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.friend-card {
+  width: 80px;
+  text-align: center;
+}
+.friend-card img {
+  width: 75px;
+  height: 75px;
+  object-fit: cover;
+  border: 1px solid #ABB6C2;
+  display: block;
+}
+.friend-card .name { display: block; margin-top: 2px; line-height: 1.1; }
+
+.friend-row {
+  display: flex;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid #EEE;
+}
+.friend-row .ava { width: 50px; height: 50px; border: 1px solid #ABB6C2; object-fit: cover; }
+.friend-row .body { flex: 1; }
+
+/* ===== Wall ===== */
+.wall-form { margin-bottom: 14px; }
+.wall-form textarea { width: 100%; height: 50px; }
+.wall-post {
+  border-bottom: 1px solid #EEE;
+  padding: 8px 0;
+  display: flex;
+  gap: 10px;
+}
+.wall-post .ava { width: 50px; height: 50px; border: 1px solid #ABB6C2; object-fit: cover; flex-shrink: 0; }
+.wall-post .body { flex: 1; }
+.wall-post .meta { color: #777; font-size: 10px; margin-top: 3px; }
+.wall-post .text { white-space: pre-wrap; word-wrap: break-word; }
+
+.comment {
+  margin-top: 6px;
+  padding-left: 10px;
+  border-left: 2px solid #DAE1E8;
+  display: flex;
+  gap: 6px;
+}
+.comment .ava { width: 30px; height: 30px; border: 1px solid #ABB6C2; object-fit: cover; }
+.comment-form input[type="text"] { width: 70%; }
+
+/* ===== Messages ===== */
+.dialog-list { }
+.dialog-row {
+  display: flex;
+  gap: 10px;
+  padding: 6px 4px;
+  border-bottom: 1px solid #EEE;
+  cursor: pointer;
+}
+.dialog-row:hover { background: #F4F7FA; }
+.dialog-row.unread { background: #FFFCE5; font-weight: bold; }
+.dialog-row .ava { width: 40px; height: 40px; border: 1px solid #ABB6C2; object-fit: cover; }
+.dialog-row .body { flex: 1; min-width: 0; }
+.dialog-row .preview {
+  color: #555;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: normal;
+}
+
+.message {
+  padding: 6px 0;
+  border-bottom: 1px solid #EEE;
+}
+.message .meta { color: #777; font-size: 10px; }
+.message .text { white-space: pre-wrap; word-wrap: break-word; }
+
+/* ===== Footer ===== */
+.footer {
+  width: 800px;
+  margin: 10px auto 20px;
+  text-align: center;
+  color: #777;
+  font-size: 10px;
+}
+.footer a { color: #2B587A; }
+
+/* ===== Auth pages ===== */
+.auth-card {
+  width: 380px;
+  margin: 60px auto;
+  background: #fff;
+  border: 1px solid #B6C3D2;
+  padding: 18px 22px;
+}
+.auth-card h1 { font-size: 13px; }
+
+/* ===== Misc ===== */
+.empty {
+  color: #999;
+  font-style: italic;
+  padding: 10px 0;
+}
+.flash {
+  background: #FFFCE5;
+  border: 1px solid #E6D77A;
+  padding: 5px 8px;
+  margin-bottom: 10px;
+}

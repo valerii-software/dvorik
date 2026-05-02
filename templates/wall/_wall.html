@@ -1,0 +1,11 @@
+<div class="wall-form">
+  <form method="post" action="{% url 'wall:post' owner.id %}"
+        hx-post="{% url 'wall:post' owner.id %}"
+        hx-target="#wall-posts" hx-swap="outerHTML">
+    {% csrf_token %}
+    {{ wall_form.text }}
+    <div style="margin-top:4px"><button class="btn btn-primary" type="submit">Отправить</button></div>
+  </form>
+</div>
+
+{% include 'wall/_posts.html' with posts=posts owner=owner %}

@@ -1,0 +1,10 @@
+{% load wall_extras %}
+<div id="wall-posts">
+  {% if posts %}
+    {% for p in posts %}
+      {% include 'wall/_post.html' with p=p owner=owner %}
+    {% endfor %}
+  {% else %}
+    <div class="empty">На стене пока ничего нет.</div>
+  {% endif %}
+</div>

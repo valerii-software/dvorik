@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Переписка с {{ other.get_full_name }} — ВКонтакте{% endblock %}
+
+{% block content %}
+<h1>Переписка с <a href="{% url 'profiles:view' other.id %}">{{ other.get_full_name }}</a></h1>
+<div style="margin-bottom:8px"><a href="{% url 'messaging:inbox' %}">← Все диалоги</a></div>
+
+{% include 'messaging/_messages.html' with messages_list=messages_list dialog=dialog other=other %}
+
+<form method="post" action="{% url 'messaging:send' dialog.id %}"
+      hx-post="{% url 'messaging:send' dialog.id %}"
+      hx-target="#messages" hx-swap="outerHTML"
+      hx-on::after-request="this.reset()"
+      style="margin-top:10px">
+  {% csrf_token %}
+  <textarea name="text" rows="3" style="width:100%" placeholder="Ваше сообщение…" required></textarea>
+  <div style="margin-top:4px"><button class="btn btn-primary" type="submit">Отправить</button></div>
+</form>
+{% endblock %}

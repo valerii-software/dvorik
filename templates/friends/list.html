@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}{% if is_me %}Мои друзья{% else %}Друзья — {{ pageuser.get_full_name }}{% endif %}{% endblock %}
+
+{% block content %}
+<h1>
+  {% if is_me %}Мои друзья
+  {% else %}Друзья пользователя <a href="{% url 'profiles:view' pageuser.id %}">{{ pageuser.get_full_name }}</a>
+  {% endif %}
+  ({{ friends|length }})
+</h1>
+
+{% if friends %}
+  {% for f in friends %}
+    <div class="friend-row">
+      <a href="{% url 'profiles:view' f.id %}"><img class="ava" src="{{ f.profile.avatar_url }}"></a>
+      <div class="body">
+        <a href="{% url 'profiles:view' f.id %}"><b>{{ f.get_full_name|default:f.email }}</b></a>
+        {% if f.profile.home_city %}<div class="muted">{{ f.profile.home_city }}</div>{% endif %}
+        <div style="margin-top:4px"><a href="{% url 'messaging:open' f.id %}">написать сообщение</a></div>
+      </div>
+    </div>
+  {% endfor %}
+{% else %}
+  <div class="empty">{% if is_me %}У вас пока нет друзей. <a href="{% url 'friends:search' %}">Найти друзей</a>{% else %}Друзей пока нет.{% endif %}</div>
+{% endif %}
+{% endblock %}

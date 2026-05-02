@@ -1,0 +1,15 @@
+<div id="messages">
+  {% if messages_list %}
+    {% for m in messages_list %}
+      <div class="message">
+        <div>
+          <a href="{% url 'profiles:view' m.sender.id %}"><b>{{ m.sender.first_name }} {{ m.sender.last_name }}</b></a>
+          <span class="muted">— {{ m.created_at|date:"j E Y, H:i" }}</span>
+        </div>
+        <div class="text">{{ m.text|linebreaksbr }}</div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="empty">Сообщений пока нет. Напишите первое!</div>
+  {% endif %}
+</div>

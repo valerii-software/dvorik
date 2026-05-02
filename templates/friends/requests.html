@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Заявки в друзья — ВКонтакте{% endblock %}
+
+{% block content %}
+<h1>Заявки в друзья</h1>
+
+<h2>Входящие ({{ incoming|length }})</h2>
+{% if incoming %}
+  {% for r in incoming %}
+    <div class="friend-row">
+      <a href="{% url 'profiles:view' r.from_user.id %}"><img class="ava" src="{{ r.from_user.profile.avatar_url }}"></a>
+      <div class="body">
+        <a href="{% url 'profiles:view' r.from_user.id %}"><b>{{ r.from_user.get_full_name }}</b></a>
+        <div class="muted">{{ r.created_at|date:"j E Y, H:i" }}</div>
+        <div style="margin-top:4px; display:flex; gap:6px;">
+          {% include 'friends/_btn.html' with action='accept' label='Принять' uid=r.from_user.id %}
+          {% include 'friends/_btn.html' with action='reject' label='Отклонить' uid=r.from_user.id %}
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+{% else %}
+  <div class="empty">Нет входящих заявок.</div>
+{% endif %}
+
+<h2>Исходящие ({{ outgoing|length }})</h2>
+{% if outgoing %}
+  {% for r in outgoing %}
+    <div class="friend-row">
+      <a href="{% url 'profiles:view' r.to_user.id %}"><img class="ava" src="{{ r.to_user.profile.avatar_url }}"></a>
+      <div class="body">
+        <a href="{% url 'profiles:view' r.to_user.id %}"><b>{{ r.to_user.get_full_name }}</b></a>
+        <div class="muted">{{ r.created_at|date:"j E Y, H:i" }}</div>
+        {% include 'friends/_btn.html' with action='cancel' label='Отменить заявку' uid=r.to_user.id %}
+      </div>
+    </div>
+  {% endfor %}
+{% else %}
+  <div class="empty">Нет исходящих заявок.</div>
+{% endif %}
+{% endblock %}

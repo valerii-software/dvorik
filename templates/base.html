@@ -1,0 +1,62 @@
+{% load static %}<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>{% block title %}ВКонтакте{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/vk2010.css' %}">
+  <script src="https://unpkg.com/htmx.org@1.9.12" defer></script>
+</head>
+<body>
+
+{% if user.is_authenticated %}
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="logo" href="{% url 'profiles:my_page' %}">ВКонтакте</a>
+    <form class="topbar-search" method="get" action="{% url 'friends:search' %}">
+      <input type="text" name="q" value="{{ request.GET.q|default:'' }}" placeholder="Поиск людей">
+    </form>
+    <span class="topbar-user">
+      <a href="{% url 'profiles:my_page' %}">{{ user.first_name }}</a>
+      &nbsp;|&nbsp;
+      <a href="{% url 'accounts:logout' %}">выход</a>
+    </span>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <ul>
+      <li><a href="{% url 'profiles:my_page' %}" class="{% if section == 'profile' %}active{% endif %}">Моя страница</a></li>
+      <li><a href="{% url 'friends:my_friends' %}" class="{% if section == 'friends' %}active{% endif %}">Мои друзья</a></li>
+      <li><a href="{% url 'messaging:inbox' %}" class="{% if section == 'messages' %}active{% endif %}">Мои сообщения</a></li>
+      <li><a href="{% url 'friends:requests' %}" class="{% if section == 'requests' %}active{% endif %}">Заявки в друзья</a></li>
+      <li><a href="{% url 'friends:search' %}" class="{% if section == 'search' %}active{% endif %}">Поиск людей</a></li>
+      <li><a href="{% url 'profiles:edit' %}" class="{% if section == 'edit' %}active{% endif %}">Мои настройки</a></li>
+    </ul>
+  </div>
+  <div class="content">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="flash">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+    {% block content %}{% endblock %}
+  </div>
+</div>
+{% else %}
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="logo" href="/">ВКонтакте</a>
+  </div>
+</div>
+{% block anon_content %}{% endblock %}
+{% endif %}
+
+<div class="footer">
+  © 2006–2010 ВКонтакте &nbsp;·&nbsp;
+  <a href="{% url 'accounts:login' %}">Помощь</a> &nbsp;·&nbsp;
+  Зарегистрировано пользователей: <b>{{ total_users }}</b>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,40 @@
+{% load wall_extras %}
+<div class="wall-post" id="post-{{ p.id }}">
+  <a href="{% url 'profiles:view' p.author.id %}"><img class="ava" src="{{ p.author.profile.avatar_url }}"></a>
+  <div class="body">
+    <div>
+      <a href="{% url 'profiles:view' p.author.id %}"><b>{{ p.author.get_full_name }}</b></a>
+    </div>
+    <div class="text">{{ p.text|linebreaksbr }}</div>
+    <div class="meta">
+      {{ p.created_at|date:"j E Y, H:i" }}
+      {% if p.author_id == request.user.id or p.owner_id == request.user.id %}
+        &nbsp;·&nbsp;
+        <form method="post" action="{% url 'wall:delete' p.id %}" style="display:inline">
+          {% csrf_token %}
+          <button class="btn" style="padding:0 4px; font-size:10px" type="submit">удалить</button>
+        </form>
+      {% endif %}
+    </div>
+
+    {% for c in p.comments.all %}
+      <div class="comment">
+        <a href="{% url 'profiles:view' c.author.id %}"><img class="ava" src="{{ c.author.profile.avatar_url }}"></a>
+        <div>
+          <a href="{% url 'profiles:view' c.author.id %}"><b>{{ c.author.first_name }} {{ c.author.last_name }}</b></a>
+          <div class="text">{{ c.text|linebreaksbr }}</div>
+          <div class="meta">{{ c.created_at|date:"j E Y, H:i" }}</div>
+        </div>
+      </div>
+    {% endfor %}
+
+    <form class="comment-form" method="post" action="{% url 'wall:comment' p.id %}"
+          hx-post="{% url 'wall:comment' p.id %}"
+          hx-target="#post-{{ p.id }}" hx-swap="outerHTML"
+          style="margin-top:6px">
+      {% csrf_token %}
+      <input type="text" name="text" placeholder="Комментарий…" required>
+      <button class="btn" type="submit">→</button>
+    </form>
+  </div>
+</div>
