@@ -1,6 +1,7 @@
 from django.contrib import messages as flash
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
@@ -9,6 +10,21 @@ from friends.models import Friendship
 from profiles.permissions import can_view
 
 from .models import Dialog, Message
+
+
+MESSAGES_PER_PAGE = 30
+
+
+def _paginate_messages(dialog, page_num):
+    """Returns (messages_in_chronological_order, page_obj). Page 1 = newest."""
+    qs = (
+        dialog.messages
+        .select_related('sender', 'sender__profile')
+        .order_by('-created_at')
+    )
+    paginator = Paginator(qs, MESSAGES_PER_PAGE)
+    page = paginator.get_page(page_num)
+    return list(reversed(page.object_list)), page
 
 User = get_user_model()
 
@@ -66,7 +82,7 @@ def open_chat(request, dialog_id):
 
 def _render_chat(request, dialog):
     dialog.messages.filter(read=False).exclude(sender=request.user).update(read=True)
-    msgs = dialog.messages.select_related('sender', 'sender__profile').all()
+    msgs, page = _paginate_messages(dialog, request.GET.get('page', 1))
     members = list(dialog.participants.select_related('profile').all())
     is_creator = dialog.is_group and dialog.created_by_id == request.user.id
     addable = []
@@ -83,6 +99,7 @@ def _render_chat(request, dialog):
         'members': members,
         'addable_friends': addable,
         'messages_list': msgs,
+        'page': page,
     })
 
 
@@ -108,9 +125,9 @@ def send(request, dialog_id):
         dialog.last_message_at = timezone.now()
         dialog.save(update_fields=['last_message_at'])
     if request.headers.get('HX-Request'):
-        msgs = dialog.messages.select_related('sender', 'sender__profile').all()
+        msgs, page = _paginate_messages(dialog, 1)
         return render(request, 'messaging/_messages.html', {
-            'messages_list': msgs, 'dialog': dialog,
+            'messages_list': msgs, 'dialog': dialog, 'page': page,
         })
     return redirect('messaging:open_chat', dialog_id=dialog.id)
 

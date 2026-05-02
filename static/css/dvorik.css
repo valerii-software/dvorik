@@ -556,6 +556,18 @@ textarea { resize: vertical; }
   font-weight: normal;
 }
 
+.msg-pager {
+  text-align: center;
+  padding: 6px 0;
+  margin-bottom: 4px;
+  border-bottom: 1px solid #DAE1E8;
+  font-size: 11px;
+}
+.msg-pager a, .msg-pager .disabled {
+  margin: 0 8px;
+}
+.msg-pager .disabled { color: #BBB; }
+
 .message {
   padding: 6px 0;
   border-bottom: 1px solid #EEE;
