@@ -12,4 +12,6 @@ urlpatterns = [
     path('add/<int:track_id>/', views.add_to_mine, name='add'),
     path('remove/<int:track_id>/', views.remove_from_mine, name='remove'),
     path('delete/<int:track_id>/', views.delete_track, name='delete'),
+    path('now-playing/<int:track_id>/', views.set_now_playing, name='set_now_playing'),
+    path('now-playing/clear/', views.clear_now_playing, name='clear_now_playing'),
 ]

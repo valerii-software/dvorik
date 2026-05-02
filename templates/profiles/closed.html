@@ -3,6 +3,9 @@
 
 {% block content %}
 <h1>{{ pageuser.get_full_name }}</h1>
+{% if profile.is_listening_now %}
+  <div class="now-playing">♪ Слушает: <b>{{ profile.now_playing.artist }}</b> — {{ profile.now_playing.title }}</div>
+{% endif %}
 
 <div class="profile-grid">
   <div class="profile-photo">

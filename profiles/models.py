@@ -85,6 +85,12 @@ class Profile(models.Model):
 
     last_seen = models.DateTimeField(null=True, blank=True, db_index=True)
 
+    now_playing = models.ForeignKey(
+        'audio.AudioTrack', on_delete=models.SET_NULL,
+        null=True, blank=True, related_name='+',
+    )
+    now_playing_at = models.DateTimeField(null=True, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -96,6 +102,16 @@ class Profile(models.Model):
         if self.avatar:
             return self.avatar.url
         return '/static/img/no_photo.png'
+
+    NOW_PLAYING_TTL_MINUTES = 15
+
+    @property
+    def is_listening_now(self):
+        if not self.now_playing_id or not self.now_playing_at:
+            return False
+        from datetime import timedelta
+        from django.utils import timezone
+        return (timezone.now() - self.now_playing_at) < timedelta(minutes=self.NOW_PLAYING_TTL_MINUTES)
 
     # Profile completion (own page only): list of (label, points, satisfied)
     COMPLETION_ITEMS = (

@@ -11,6 +11,9 @@
 {% if not profile|is_online and profile.last_seen %}
   <div class="last-seen">{{ profile|last_seen_label }}</div>
 {% endif %}
+{% if profile.is_listening_now %}
+  <div class="now-playing">♪ Слушает: <b>{{ profile.now_playing.artist }}</b> — {{ profile.now_playing.title }}</div>
+{% endif %}
 
 <div class="profile-grid">
   <div class="profile-photo">

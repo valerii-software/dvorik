@@ -5,12 +5,16 @@
  * mirror the header state for the row whose data-src matches the
  * player's src. A "playlist" snapshot is captured each time the user
  * starts a new track from a list, enabling prev/next/auto-advance.
+ *
+ * On every track start we POST /audio/now-playing/<id>/ so the user's
+ * profile shows "♪ Слушает: ..." for others.
  */
 (function () {
   const audio = new Audio();
   audio.preload = 'none';
   let currentSrc = null;
-  let playlist = []; // [{src, artist, title}]
+  let currentTrackId = null;
+  let playlist = []; // [{src, artist, title, id}]
   let currentIndex = -1;
 
   function $(id) { return document.getElementById(id); }
@@ -28,9 +32,36 @@
     });
   }
 
+  function csrfToken() {
+    const m = document.cookie.match(/(?:^|;\s*)csrftoken=([^;]+)/);
+    return m ? decodeURIComponent(m[1]) : '';
+  }
+
+  function pingNowPlaying(trackId) {
+    if (!trackId) return;
+    fetch('/audio/now-playing/' + trackId + '/', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'X-CSRFToken': csrfToken() },
+    }).catch(function () {});
+  }
+
+  function clearNowPlaying() {
+    fetch('/audio/now-playing/clear/', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'X-CSRFToken': csrfToken() },
+    }).catch(function () {});
+  }
+
   function rowsToTracks() {
     return Array.from(document.querySelectorAll('.audio-row')).map(function (r) {
-      return { src: r.dataset.src, artist: r.dataset.artist, title: r.dataset.title };
+      return {
+        src: r.dataset.src,
+        id: r.dataset.trackId,
+        artist: r.dataset.artist,
+        title: r.dataset.title,
+      };
     });
   }
 
@@ -81,9 +112,11 @@
 
   function loadAndPlay(track) {
     currentSrc = track.src;
+    currentTrackId = track.id;
     audio.src = track.src;
     setHeaderTitle(track.artist, track.title);
     audio.play();
+    pingNowPlaying(track.id);
   }
 
   function playFromRow(row) {
@@ -92,7 +125,6 @@
       if (audio.paused) audio.play(); else audio.pause();
       return;
     }
-    // Snapshot the current page's tracks as the active playlist.
     playlist = rowsToTracks();
     currentIndex = playlist.findIndex(function (t) { return t.src === src; });
     loadAndPlay(playlist[currentIndex]);
@@ -114,8 +146,10 @@
     audio.removeAttribute('src');
     audio.load();
     currentSrc = null;
+    currentTrackId = null;
     playlist = [];
     currentIndex = -1;
+    clearNowPlaying();
     paint();
   }
 

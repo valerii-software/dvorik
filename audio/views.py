@@ -2,9 +2,12 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 from django.views.decorators.http import require_POST
 
+from profiles.models import Profile
 from profiles.permissions import can_view
 
 from .forms import AudioUploadForm
@@ -99,3 +102,26 @@ def delete_track(request, track_id):
     track.delete()
     messages.info(request, 'Аудиозапись удалена.')
     return redirect('audio:my_audio')
+
+
+@login_required
+@require_POST
+def set_now_playing(request, track_id):
+    """Marks `track_id` as the user's currently-playing track."""
+    if not AudioTrack.objects.filter(pk=track_id).exists():
+        return JsonResponse({'ok': False}, status=404)
+    Profile.objects.filter(user=request.user).update(
+        now_playing_id=track_id,
+        now_playing_at=timezone.now(),
+    )
+    return JsonResponse({'ok': True})
+
+
+@login_required
+@require_POST
+def clear_now_playing(request):
+    Profile.objects.filter(user=request.user).update(
+        now_playing_id=None,
+        now_playing_at=None,
+    )
+    return JsonResponse({'ok': True})
