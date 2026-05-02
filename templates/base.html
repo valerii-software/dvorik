@@ -4,7 +4,8 @@
   <meta charset="utf-8">
   <title>{% block title %}ВКонтакте{% endblock %}</title>
   <link rel="stylesheet" href="{% static 'css/vk2010.css' %}">
-  <script src="https://unpkg.com/htmx.org@1.9.12" defer></script>
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <script src="{% static 'js/audio_player.js' %}" defer></script>
 </head>
 <body>
 
@@ -23,8 +24,20 @@
       <input type="text" name="q" value="{{ request.GET.q|default:'' }}" placeholder="Поиск">
     </form>
   </div>
+  <div class="topbar-player" id="topbar-player" hidden>
+    <div class="topbar-player-inner">
+      <button type="button" class="player-toggle" id="player-toggle">❚❚</button>
+      <div class="player-meta">
+        <div class="player-title" id="player-title"></div>
+        <div class="player-progress" id="player-progress"><div class="player-progress-fill" id="player-progress-fill"></div></div>
+      </div>
+      <span class="player-time" id="player-time">0:00</span>
+      <button type="button" class="player-close" id="player-close" title="Закрыть">×</button>
+    </div>
+  </div>
 </div>
 
+<div id="page-body" hx-boost="true" hx-target="#page-body" hx-select="#page-body" hx-swap="outerHTML show:window:top">
 <div class="layout">
   <div class="sidebar">
     <ul>
@@ -52,6 +65,13 @@
     {% block content %}{% endblock %}
   </div>
 </div>
+
+<div class="footer">
+  © 2006–2010 ВКонтакте &nbsp;·&nbsp;
+  <a href="{% url 'accounts:login' %}">Помощь</a> &nbsp;·&nbsp;
+  Зарегистрировано пользователей: <b>{{ total_users }}</b>
+</div>
+</div>
 {% else %}
 <div class="topbar">
   <div class="topbar-inner">
@@ -59,13 +79,12 @@
   </div>
 </div>
 {% block anon_content %}{% endblock %}
-{% endif %}
-
 <div class="footer">
   © 2006–2010 ВКонтакте &nbsp;·&nbsp;
   <a href="{% url 'accounts:login' %}">Помощь</a> &nbsp;·&nbsp;
   Зарегистрировано пользователей: <b>{{ total_users }}</b>
 </div>
+{% endif %}
 
 </body>
 </html>

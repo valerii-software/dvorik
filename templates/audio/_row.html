@@ -1,4 +1,7 @@
-<div class="audio-row" data-src="{{ track.file.url }}">
+<div class="audio-row"
+     data-src="{{ track.file.url }}"
+     data-artist="{{ track.artist }}"
+     data-title="{{ track.title }}">
   <button type="button" class="audio-play" aria-label="Воспроизвести">▶</button>
   <div class="audio-meta">
     <div class="audio-title"><b>{{ track.artist }}</b> — {{ track.title }}</div>

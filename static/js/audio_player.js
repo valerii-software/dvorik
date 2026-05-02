@@ -1,7 +1,16 @@
-/* Single-track audio player matching VK 2010 — only one row plays at a time. */
+/* VK 2010-style audio player.
+ *
+ * One global Audio() instance. Header player ("topbar-player") shows the
+ * current track and survives HTMX-boosted navigation. Track rows on the
+ * audio pages mirror the header state for the row whose data-src matches
+ * the player's src.
+ */
 (function () {
-  let current = null; // { row, audio } currently playing
-  const audioPool = new WeakMap();
+  const audio = new Audio();
+  audio.preload = 'none';
+  let currentSrc = null;
+
+  function $(id) { return document.getElementById(id); }
 
   function fmt(t) {
     if (!isFinite(t)) return '0:00';
@@ -10,63 +19,127 @@
     return m + ':' + s;
   }
 
-  function audioFor(row) {
-    let a = audioPool.get(row);
-    if (a) return a;
-    a = new Audio(row.dataset.src);
-    a.preload = 'none';
-    const fill = row.querySelector('.audio-progress-fill');
-    const time = row.querySelector('.audio-time');
-    const btn = row.querySelector('.audio-play');
-    a.addEventListener('timeupdate', function () {
-      const dur = a.duration || 0;
-      fill.style.width = (dur ? (a.currentTime / dur) * 100 : 0) + '%';
-      time.textContent = fmt(a.currentTime) + (dur ? ' / ' + fmt(dur) : '');
-    });
-    a.addEventListener('loadedmetadata', function () {
-      time.textContent = '0:00 / ' + fmt(a.duration);
-    });
-    a.addEventListener('ended', function () {
-      btn.textContent = '▶';
-      btn.classList.remove('playing');
-      fill.style.width = '0%';
-      if (current && current.audio === a) current = null;
-    });
-    audioPool.set(row, a);
-    return a;
+  function visibleRowFor(src) {
+    return document.querySelector('.audio-row[data-src="' + CSS.escape(src) + '"]');
   }
 
-  function stop(entry) {
-    entry.audio.pause();
-    entry.row.querySelector('.audio-play').textContent = '▶';
-    entry.row.querySelector('.audio-play').classList.remove('playing');
-  }
-
-  document.addEventListener('click', function (e) {
-    const btn = e.target.closest('.audio-play');
-    if (btn) {
-      const row = btn.closest('.audio-row');
-      const audio = audioFor(row);
-      if (current && current.row === row) {
-        stop(current);
-        current = null;
-      } else {
-        if (current) stop(current);
-        audio.play();
-        btn.textContent = '❚❚';
-        btn.classList.add('playing');
-        current = { row: row, audio: audio };
-      }
+  function paintHeader() {
+    const bar = $('topbar-player');
+    if (!bar) return;
+    if (!currentSrc) {
+      bar.hidden = true;
       return;
     }
+    bar.hidden = false;
+    $('player-toggle').textContent = audio.paused ? '▶' : '❚❚';
+    const dur = audio.duration || 0;
+    $('player-progress-fill').style.width = (dur ? (audio.currentTime / dur) * 100 : 0) + '%';
+    $('player-time').textContent = fmt(audio.currentTime) + (dur ? ' / ' + fmt(dur) : '');
+  }
 
-    const bar = e.target.closest('.audio-progress');
-    if (bar) {
-      const row = bar.closest('.audio-row');
-      const audio = audioFor(row);
-      const rect = bar.getBoundingClientRect();
-      const ratio = (e.clientX - rect.left) / rect.width;
-      if (audio.duration) audio.currentTime = ratio * audio.duration;
+  function paintRows() {
+    document.querySelectorAll('.audio-row').forEach(function (row) {
+      const isCurrent = currentSrc && row.dataset.src === currentSrc;
+      const btn = row.querySelector('.audio-play');
+      const fill = row.querySelector('.audio-progress-fill');
+      const time = row.querySelector('.audio-time');
+      if (!btn) return;
+      if (isCurrent) {
+        btn.textContent = audio.paused ? '▶' : '❚❚';
+        btn.classList.toggle('playing', !audio.paused);
+        const dur = audio.duration || 0;
+        if (fill) fill.style.width = (dur ? (audio.currentTime / dur) * 100 : 0) + '%';
+        if (time) time.textContent = fmt(audio.currentTime) + (dur ? ' / ' + fmt(dur) : '');
+      } else {
+        btn.textContent = '▶';
+        btn.classList.remove('playing');
+        if (fill) fill.style.width = '0%';
+        if (time) time.textContent = '0:00';
+      }
+    });
+  }
+
+  function paint() { paintHeader(); paintRows(); }
+
+  function setHeaderTitle(artist, title) {
+    const el = $('player-title');
+    if (el) el.innerHTML = '<b>' + escapeHTML(artist) + '</b> — ' + escapeHTML(title);
+  }
+
+  function escapeHTML(s) {
+    return (s || '').replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function playFromRow(row) {
+    const src = row.dataset.src;
+    if (currentSrc === src) {
+      if (audio.paused) audio.play(); else audio.pause();
+      return;
+    }
+    currentSrc = src;
+    audio.src = src;
+    setHeaderTitle(row.dataset.artist, row.dataset.title);
+    audio.play();
+  }
+
+  function togglePause() {
+    if (!currentSrc) return;
+    if (audio.paused) audio.play(); else audio.pause();
+  }
+
+  function close() {
+    audio.pause();
+    audio.removeAttribute('src');
+    audio.load();
+    currentSrc = null;
+    paint();
+  }
+
+  audio.addEventListener('timeupdate', paint);
+  audio.addEventListener('play', paint);
+  audio.addEventListener('pause', paint);
+  audio.addEventListener('loadedmetadata', paint);
+  audio.addEventListener('ended', function () {
+    audio.currentTime = 0;
+    paint();
+  });
+
+  document.addEventListener('click', function (e) {
+    const playBtn = e.target.closest('.audio-play');
+    if (playBtn) {
+      const row = playBtn.closest('.audio-row');
+      if (row) playFromRow(row);
+      return;
+    }
+    if (e.target.closest('#player-toggle')) {
+      togglePause();
+      return;
+    }
+    if (e.target.closest('#player-close')) {
+      close();
+      return;
+    }
+    const headerBar = e.target.closest('#player-progress');
+    if (headerBar && audio.duration) {
+      const r = headerBar.getBoundingClientRect();
+      audio.currentTime = ((e.clientX - r.left) / r.width) * audio.duration;
+      return;
+    }
+    const rowBar = e.target.closest('.audio-progress');
+    if (rowBar) {
+      const row = rowBar.closest('.audio-row');
+      if (row && row.dataset.src === currentSrc && audio.duration) {
+        const r = rowBar.getBoundingClientRect();
+        audio.currentTime = ((e.clientX - r.left) / r.width) * audio.duration;
+      }
     }
   });
+
+  // After HTMX swap (boost navigation), re-paint visible rows.
+  document.body.addEventListener('htmx:afterSettle', paint);
+  // Also after first DOM ready.
+  if (document.readyState !== 'loading') paint();
+  else document.addEventListener('DOMContentLoaded', paint);
 })();
