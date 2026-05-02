@@ -771,6 +771,11 @@ canvas#graffiti {
   border: 1px solid #ABB6C2;
   display: block;
 }
+/* Message images are tighter so the chat thread reads compactly. */
+.message .wall-image img {
+  max-width: 240px;
+  max-height: 200px;
+}
 .file-pick {
   cursor: pointer;
   font-size: 11px;
