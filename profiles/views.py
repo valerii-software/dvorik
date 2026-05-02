@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
 from friends.models import Friendship
+from photos.models import Album, Photo, PhotoTag
 from wall.forms import WallPostForm
 from wall.models import WallPost
 
@@ -27,6 +28,9 @@ def view_profile(request, user_id):
     friend_count = Friendship.friends_qs(user).count()
     friends_preview = Friendship.friends_qs(user)[:6]
     posts = WallPost.objects.filter(owner=user).select_related('author', 'author__profile')
+    album_count = Album.objects.filter(owner=user).count()
+    recent_photos = Photo.objects.filter(album__owner=user).order_by('-created_at')[:6]
+    photos_with_user = Photo.objects.filter(tags__user=user).distinct().order_by('-created_at')[:6]
     return render(request, 'profiles/view.html', {
         'section': 'profile' if is_me else None,
         'pageuser': user,
@@ -37,6 +41,9 @@ def view_profile(request, user_id):
         'friends_preview': friends_preview,
         'posts': posts,
         'wall_form': WallPostForm(),
+        'album_count': album_count,
+        'recent_photos': recent_photos,
+        'photos_with_user': photos_with_user,
     })
 
 

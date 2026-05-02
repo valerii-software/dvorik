@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block title %}Фотография — {{ album.title }}{% endblock %}
+
+{% block content %}
+<div class="muted" style="margin-bottom:4px">
+  <a href="{% url 'photos:user_albums' album.owner.id %}">Фотографии</a>
+  &nbsp;›&nbsp;
+  <a href="{% url 'photos:album' album.id %}">{{ album.title }}</a>
+</div>
+
+<div class="photo-nav">
+  <span>
+    {% if prev_id %}<a href="{% url 'photos:photo' prev_id %}">← Назад</a>{% else %}<span class="muted">← Назад</span>{% endif %}
+  </span>
+  <span>
+    {% if next_id %}<a href="{% url 'photos:photo' next_id %}">Вперёд →</a>{% else %}<span class="muted">Вперёд →</span>{% endif %}
+  </span>
+</div>
+
+<div class="photo-view">
+  <a {% if next_id %}href="{% url 'photos:photo' next_id %}"{% endif %}>
+    <img src="{{ photo.image.url }}" alt="">
+  </a>
+</div>
+
+{% if photo.description %}<div style="margin:8px 0">{{ photo.description|linebreaksbr }}</div>{% endif %}
+
+<div class="muted">
+  Загрузил <a href="{% url 'profiles:view' photo.uploader.id %}">{{ photo.uploader.get_full_name }}</a>
+  · {{ photo.created_at|date:"j E Y, H:i" }}
+</div>
+
+{% if is_owner or photo.uploader_id == request.user.id %}
+  <div style="margin-top:6px; display:flex; gap:6px;">
+    <form method="post" action="{% url 'photos:set_cover' photo.id %}" style="display:inline">
+      {% csrf_token %}<button class="btn" type="submit">Сделать обложкой</button>
+    </form>
+    <form method="post" action="{% url 'photos:delete_photo' photo.id %}" style="display:inline" onsubmit="return confirm('Удалить фото?')">
+      {% csrf_token %}<button class="btn" type="submit">Удалить фото</button>
+    </form>
+  </div>
+{% endif %}
+
+<h2>На фото отмечены</h2>
+{% if tags %}
+  <div class="tag-list">
+    {% for t in tags %}
+      <div class="tag-pill">
+        <a href="{% url 'profiles:view' t.user.id %}">{{ t.user.get_full_name }}</a>
+        {% if request.user.id == t.user_id or request.user.id == t.created_by_id or is_owner %}
+          <form method="post" action="{% url 'photos:untag' t.id %}" style="display:inline">
+            {% csrf_token %}<button class="link-btn" type="submit" title="Снять отметку">×</button>
+          </form>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="muted">Никто не отмечен.</div>
+{% endif %}
+
+{% if taggable %}
+  <form method="post" action="{% url 'photos:tag' photo.id %}" style="margin-top:6px">
+    {% csrf_token %}
+    <select name="user_id">
+      {% for u in taggable %}
+        <option value="{{ u.id }}">{{ u.get_full_name }}</option>
+      {% endfor %}
+    </select>
+    <button class="btn" type="submit">Отметить друга</button>
+  </form>
+{% endif %}
+
+<h2>Комментарии</h2>
+{% for c in photo.comments.all %}
+  <div class="comment">
+    <a href="{% url 'profiles:view' c.author.id %}"><img class="ava" src="{{ c.author.profile.avatar_url }}"></a>
+    <div>
+      <a href="{% url 'profiles:view' c.author.id %}"><b>{{ c.author.get_full_name }}</b></a>
+      <div class="text">{{ c.text|linebreaksbr }}</div>
+      <div class="meta">{{ c.created_at|date:"j E Y, H:i" }}</div>
+    </div>
+  </div>
+{% empty %}
+  <div class="muted">Комментариев пока нет.</div>
+{% endfor %}
+
+<form class="comment-form" method="post" action="{% url 'photos:comment' photo.id %}" style="margin-top:8px">
+  {% csrf_token %}
+  <input type="text" name="text" placeholder="Комментарий…" required>
+  <button class="btn" type="submit">→</button>
+</form>
+{% endblock %}

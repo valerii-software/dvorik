@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}{% if is_me %}Мои фотографии{% else %}Фотографии — {{ pageuser.get_full_name }}{% endif %}{% endblock %}
+
+{% block content %}
+<h1>
+  {% if is_me %}Мои фотографии
+  {% else %}Фотографии пользователя <a href="{% url 'profiles:view' pageuser.id %}">{{ pageuser.get_full_name }}</a>
+  {% endif %}
+</h1>
+
+{% if is_me %}
+  <div style="margin-bottom:10px"><a class="btn btn-primary" href="{% url 'photos:create_album' %}">Создать альбом</a></div>
+{% endif %}
+
+{% if albums %}
+  <div class="album-grid">
+    {% for a in albums %}
+      <div class="album-card">
+        <a href="{% url 'photos:album' a.id %}"><img src="{{ a.cover_url }}" alt=""></a>
+        <a class="title" href="{% url 'photos:album' a.id %}">{{ a.title }}</a>
+        <div class="muted">{{ a.photo_count }} фото · {{ a.updated_at|date:"j M Y" }}</div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty">Альбомов пока нет.</div>
+{% endif %}
+{% endblock %}

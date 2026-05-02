@@ -1,12 +1,26 @@
+import io
 import random
 from datetime import date
 
 from django.contrib.auth import get_user_model
+from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand
+from PIL import Image, ImageDraw
 
 from friends.models import Friendship
 from messaging.models import Dialog, Message
+from photos.models import Album, Photo, PhotoTag
 from wall.models import WallPost
+
+
+def make_demo_image(text, color):
+    img = Image.new('RGB', (600, 400), color)
+    d = ImageDraw.Draw(img)
+    d.rectangle((0, 0, 599, 399), outline='#FFFFFF', width=2)
+    d.text((20, 20), text, fill='#FFFFFF')
+    buf = io.BytesIO()
+    img.save(buf, format='JPEG', quality=82)
+    return ContentFile(buf.getvalue())
 
 User = get_user_model()
 
@@ -72,5 +86,29 @@ class Command(BaseCommand):
             Message.objects.create(dialog=d, sender=users[1], text='Привет, Паша!')
             Message.objects.create(dialog=d, sender=pavel, text='Привет, Анна! Как ты?')
             Message.objects.create(dialog=d, sender=users[1], text='Отлично, спасибо! :)')
+
+        # photo albums
+        if not Album.objects.exists():
+            palettes = [
+                ('Лето 2010', '#5BA0E0', ['Море', 'Пляж', 'Закат', 'Друзья']),
+                ('С друзьями', '#7FB36A', ['Вечеринка', 'Парк', 'Кафе']),
+            ]
+            for owner, (title, color, captions) in zip([pavel, users[1]], palettes):
+                album = Album.objects.create(owner=owner, title=title, description=f'Альбом «{title}».')
+                first = None
+                for cap in captions:
+                    p = Photo(album=album, uploader=owner, description=cap)
+                    p.image.save(f'{title}_{cap}.jpg', make_demo_image(f'{title} — {cap}', color), save=False)
+                    p.save()
+                    first = first or p
+                if first:
+                    album.cover = first
+                    album.save(update_fields=['cover'])
+                # tag a friend on the first photo
+                if first and owner == pavel:
+                    PhotoTag.objects.get_or_create(
+                        photo=first, user=users[1],
+                        defaults={'created_by': pavel},
+                    )
 
         self.stdout.write(self.style.SUCCESS('Demo data ready.'))

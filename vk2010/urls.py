@@ -13,6 +13,7 @@ urlpatterns = [
     path('friends/', include('friends.urls')),
     path('wall/', include('wall.urls')),
     path('messages/', include('messaging.urls')),
+    path('photos/', include('photos.urls')),
 ]
 
 if settings.DEBUG:

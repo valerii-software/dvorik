@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Загрузить фото — {{ album.title }}{% endblock %}
+
+{% block content %}
+<div class="muted" style="margin-bottom:4px">
+  <a href="{% url 'photos:album' album.id %}">{{ album.title }}</a>
+</div>
+<h1>Загрузить фотографии</h1>
+
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  <div class="form-row">
+    <label>Файлы</label>
+    <input type="file" name="images" multiple accept="image/*">
+    {% if form.images.errors %}<div class="err">{{ form.images.errors|join:', ' }}</div>{% endif %}
+  </div>
+  <div class="form-row">
+    <label>Подпись</label>
+    <input type="text" name="description" maxlength="500">
+  </div>
+  <div class="form-row">
+    <label></label>
+    <button class="btn btn-primary" type="submit">Загрузить</button>
+    &nbsp;<a href="{% url 'photos:album' album.id %}">Отмена</a>
+  </div>
+</form>
+{% endblock %}

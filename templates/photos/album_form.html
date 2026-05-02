@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}{% if mode == 'create' %}Создать альбом{% else %}Редактировать альбом{% endif %}{% endblock %}
+
+{% block content %}
+<h1>{% if mode == 'create' %}Создать альбом{% else %}Редактировать альбом{% endif %}</h1>
+<form method="post">
+  {% csrf_token %}
+  {% for field in form %}
+    <div class="form-row">
+      <label>{{ field.label }}</label>
+      {{ field }}
+      {% if field.errors %}<div class="err">{{ field.errors|join:', ' }}</div>{% endif %}
+    </div>
+  {% endfor %}
+  <div class="form-row">
+    <label></label>
+    <button class="btn btn-primary" type="submit">Сохранить</button>
+    {% if album %}&nbsp;<a href="{% url 'photos:album' album.id %}">Отмена</a>{% endif %}
+  </div>
+</form>
+{% endblock %}

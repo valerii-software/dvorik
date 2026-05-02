@@ -67,6 +67,29 @@
   <div class="empty">Друзей пока нет.</div>
 {% endif %}
 
+{% if recent_photos %}
+  <h2>Фотографии ({{ album_count }} {% if album_count == 1 %}альбом{% elif album_count < 5 %}альбома{% else %}альбомов{% endif %})</h2>
+  <div class="photo-grid">
+    {% for p in recent_photos %}
+      <a class="photo-thumb" href="{% url 'photos:photo' p.id %}">
+        <img src="{{ p.thumbnail.url|default:p.image.url }}" alt="">
+      </a>
+    {% endfor %}
+  </div>
+  <div style="margin-top:6px"><a href="{% url 'photos:user_albums' pageuser.id %}">Все фотографии →</a></div>
+{% endif %}
+
+{% if photos_with_user %}
+  <h2>Фото с {{ pageuser.first_name }}</h2>
+  <div class="photo-grid">
+    {% for p in photos_with_user %}
+      <a class="photo-thumb" href="{% url 'photos:photo' p.id %}">
+        <img src="{{ p.thumbnail.url|default:p.image.url }}" alt="">
+      </a>
+    {% endfor %}
+  </div>
+{% endif %}
+
 <h2>Стена</h2>
 {% include 'wall/_wall.html' with posts=posts owner=pageuser wall_form=wall_form %}
 

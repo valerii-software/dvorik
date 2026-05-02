@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'friends',
     'wall',
     'messaging',
+    'photos',
 ]
 
 MIDDLEWARE = [

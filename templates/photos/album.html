@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}{{ album.title }} — ВКонтакте{% endblock %}
+
+{% block content %}
+<div class="muted" style="margin-bottom:4px">
+  <a href="{% url 'photos:user_albums' album.owner.id %}">Альбомы пользователя {{ album.owner.get_full_name }}</a>
+</div>
+<h1>{{ album.title }}</h1>
+
+{% if album.description %}<div style="margin-bottom:10px">{{ album.description|linebreaksbr }}</div>{% endif %}
+
+{% if is_owner %}
+  <div style="margin-bottom:10px">
+    <a class="btn btn-primary" href="{% url 'photos:upload' album.id %}">Загрузить фотографии</a>
+    &nbsp;<a class="btn" href="{% url 'photos:edit_album' album.id %}">Редактировать альбом</a>
+    &nbsp;<form method="post" action="{% url 'photos:delete_album' album.id %}" style="display:inline" onsubmit="return confirm('Удалить альбом?')">
+      {% csrf_token %}<button class="btn" type="submit">Удалить альбом</button>
+    </form>
+  </div>
+{% endif %}
+
+{% if photos %}
+  <div class="photo-grid">
+    {% for p in photos %}
+      <a class="photo-thumb" href="{% url 'photos:photo' p.id %}">
+        <img src="{{ p.thumbnail.url|default:p.image.url }}" alt="">
+      </a>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty">В альбоме пока нет фотографий.</div>
+{% endif %}
+{% endblock %}
