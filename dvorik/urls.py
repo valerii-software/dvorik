@@ -3,10 +3,11 @@ from django.contrib import admin
 from django.shortcuts import redirect
 from django.urls import include, path, re_path
 
-from . import media_views
+from . import media_views, views as project_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('healthz/', project_views.healthz),
     path('', lambda r: redirect('profiles:my_page') if r.user.is_authenticated
          else redirect('accounts:login')),
     path('accounts/', include('accounts.urls')),

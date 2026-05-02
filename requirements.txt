@@ -4,3 +4,5 @@ python-dotenv
 Pillow
 dj-database-url
 gunicorn
+redis>=5.0
+sentry-sdk[django]

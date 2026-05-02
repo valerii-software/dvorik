@@ -6,8 +6,7 @@
 
 🔗 <https://github.com/valerii-software/dvorik>
 
-**Стек:** Django 5 · Templates · HTMX · PostgreSQL (или SQLite для локалки) ·
-Pillow · gunicorn · nginx.
+**Стек:** Django 5 · Templates · HTMX · PostgreSQL · Redis · gunicorn · nginx · Pillow.
 
 ## Возможности
 
@@ -23,7 +22,7 @@ Pillow · gunicorn · nginx.
 - Группы: создание, вступление, отдельная стена, поиск
 - Лента новостей: посты друзей и групп
 - Сообщения: 1-к-1 диалоги, инбокс с непрочитанными
-- 8 настроек приватности: профиль / стена / фото / аудио / видео / группы / сообщения
+- 8 настроек приватности
 
 ## Локальная разработка
 
@@ -37,78 +36,142 @@ python3 -m venv .venv
 .venv/bin/python manage.py runserver
 ```
 
-Откройте <http://127.0.0.1:8000> и войдите как `pavel@dvorik.local` / `demo1234`.
+Откройте <http://127.0.0.1:8000>, войдите как `pavel@dvorik.local` / `demo1234`.
 
-Демо-пользователи: `pavel@dvorik.local`, `anna@dvorik.local`, `mikhail@dvorik.local`,
-`katya@dvorik.local`, `dmitry@dvorik.local`, `olga@dvorik.local` (пароль `demo1234`).
-
-По умолчанию используется SQLite. Чтобы поднять Postgres локально:
+По умолчанию используется SQLite и in-memory кэш. Для Postgres + Redis локально:
 
 ```bash
-docker compose up -d db
-echo 'DATABASE_URL=postgres://dvorik:dvorik@localhost:5432/dvorik' >> .env
+docker compose up -d db redis
+cat >> .env <<EOF
+DATABASE_URL=postgres://dvorik:dvorik@localhost:5432/dvorik
+REDIS_URL=redis://localhost:6379/0
+EOF
 ```
 
-## Деплой через docker-compose + nginx
+## Production-стек (docker compose)
 
-Стек: `nginx` (порт 80) → `web` (gunicorn:8000) → `db` (postgres:16).
-Статика и медиа отдаются nginx напрямую — `/static/` с длинным кэшем,
-`/media/` с поддержкой HTTP Range для перемотки видео и аудио.
+```
+[Internet] → nginx :80 → gunicorn web:8000 → postgres db:5432
+                ↓                          → redis:6379 (cache + sessions)
+              /static/ (volume)
+              /media/  (volume, Range-aware)
+```
 
-1. **Подготовьте `.env`** в корне проекта (см. `.env.example`):
+Что внутри:
 
-   ```env
-   SECRET_KEY=$(python -c 'import secrets; print(secrets.token_urlsafe(50))')
-   DEBUG=0
-   ALLOWED_HOSTS=dvorik.example.com,localhost
-   CSRF_TRUSTED_ORIGINS=https://dvorik.example.com
-   POSTGRES_USER=dvorik
-   POSTGRES_PASSWORD=<сильный пароль>
-   POSTGRES_DB=dvorik
-   HTTP_PORT=80
-   ```
+- **nginx** — gzip, per-IP rate limit (5/мин на /accounts/login|register/, 2/с
+  на write-эндпоинты, 20/с на остальное), 30-дневный кэш `/static/`,
+  HTTP Range на `/media/`, security headers.
+- **gunicorn** — `gthread` воркеры, 4 workers × 4 threads (env-настраиваемо),
+  `--max-requests 1000` для защиты от утечек, `--worker-tmp-dir /dev/shm`.
+- **redis** — кэш Django + `cached_db` сессии, `maxmemory 256mb` с
+  `allkeys-lru`.
+- **postgres** — `conn_max_age=600`, `conn_health_checks=True`.
+- **healthchecks** — `/healthz/` пингует БД, docker-compose ждёт DB+Redis
+  готовности перед стартом web.
+- **Sentry** (опционально, через `SENTRY_DSN`).
+- **SMTP** (опционально, через `EMAIL_HOST/USER/PASSWORD`).
 
-2. **Запустите:**
+### Запуск
 
-   ```bash
-   docker compose up -d --build
-   ```
+```bash
+cp .env.example .env
+# отредактируйте: SECRET_KEY, ALLOWED_HOSTS, CSRF_TRUSTED_ORIGINS, POSTGRES_PASSWORD
+docker compose up -d --build
+docker compose exec web python manage.py createsuperuser
+```
 
-   `web` сам прогонит `collectstatic` и `migrate` при старте.
-
-3. **(Опционально) Засейдите демо-данные:**
-
-   ```bash
-   docker compose exec web python manage.py seed_demo
-   docker compose exec web python manage.py createsuperuser
-   ```
-
-4. **Логи / перезапуск:**
-
-   ```bash
-   docker compose logs -f web nginx
-   docker compose restart web
-   ```
+`web` сам прогонит `collectstatic` и `migrate` при старте.
 
 ### HTTPS
 
-`nginx.conf` слушает только 80. Для боевого HTTPS вынесите TLS-терминацию
-на внешний прокси (Caddy / Traefik / Cloudflare Tunnel) или допишите
-`server { listen 443 ssl; … }` в `nginx.conf` и смонтируйте сертификаты.
-Django уже настроен трастить `X-Forwarded-Proto`, ставить `Secure`-куки и
-HSTS при `DEBUG=0`.
+`nginx.conf` слушает только 80. Для прода:
+- Поставьте перед нашим nginx ещё один прокси с TLS (Caddy / Traefik /
+  Cloudflare Tunnel) — самый простой путь, бесплатные сертификаты.
+- Или допишите `server { listen 443 ssl; … }` в [nginx.conf](nginx.conf)
+  и смонтируйте сертификаты от Let's Encrypt.
 
-### Бэкап
+Django уже трастит `X-Forwarded-Proto`, ставит `Secure`-куки и HSTS
+при `DEBUG=0`.
 
-```bash
-docker compose exec db pg_dump -U dvorik dvorik > backup.sql
-docker compose run --rm -v $(pwd):/backup web tar czf /backup/media.tgz media/
+### Бэкапы
+
+[scripts/backup.sh](scripts/backup.sh) делает gzip-дамп Postgres и tar
+медиа-папки. Подключите в cron:
+
+```cron
+0 3 * * *  cd /opt/dvorik && ./scripts/backup.sh >> /var/log/dvorik-backup.log 2>&1
 ```
+
+Хранит последние 14 дней, удаляет старее.
+
+## Масштабирование до ~100 000 пользователей
+
+Реалистичная нагрузка на 100k registered:
+- DAU ≈ 10–15k, peak concurrent ≈ 1–2k, peak RPS ≈ 200–500.
+- Медиа: 200–800 ГБ суммарно (фото + аудио + видео).
+
+Текущая конфигурация **держит это на одном сервере** при условии:
+
+| Что | Значение |
+| --- | --- |
+| Web | gunicorn 4w×4t = 16 параллельных запросов на 4 vCPU |
+| DB  | Postgres 16, `shared_buffers 4GB`, `effective_cache_size 12GB` (тюнинг отдельно) |
+| Cache | Redis 256 MB, LRU |
+| Диск | 200 GB локально для горячих данных, остальное на S3-совместимое объектное хранилище |
+| Сеть | 1 Gbit/s исходящего вполне хватит |
+
+### Что докрутить, когда упрёмся
+
+1. **Медиа на объектное хранилище** (Hetzner Object Storage / Backblaze B2 /
+   Cloudflare R2) через `django-storages[s3]`. Отдавать через CDN
+   (Cloudflare даёт бесплатный egress). Локальный диск перестанет быть
+   bottleneck.
+2. **Postgres connection pooling** — добавить контейнер `pgbouncer` между
+   web и db, режим `transaction`. Особенно если будет много воркеров.
+3. **Celery + Redis** для асинхронных задач (генерация thumbnail на upload,
+   отправка email). Добавится сервис `worker`.
+4. **CDN перед nginx** — Cloudflare/Bunny отдадут `/static/` и `/media/`
+   из edge-кэша, остальное проксируют. Снимет ~70% трафика с VPS.
+5. **Read replica** Postgres для тяжёлых выборок (лента, поиск).
+6. **Горизонтальное масштабирование web** — поднять второй `web` контейнер,
+   nginx уже знает про upstream-балансировку (`upstream django { server web:8000; }` →
+   добавить `server web2:8000`).
+
+### Где хостить (не в РФ)
+
+| Провайдер | Локации | Конфиг для 100k | Цена |
+| --- | --- | --- | --- |
+| **Hetzner Cloud** ⭐ | DE / FI / US / SG | `CCX23`: 4 dedicated vCPU, 16 GB RAM, 240 GB NVMe | ~€30/мес |
+| Hetzner Cloud (бюджет) | то же | `CX42`: 8 shared vCPU, 16 GB RAM, 160 GB | ~€20/мес |
+| **Scaleway** | FR / NL / PL | `PLAY2-PICO` (4 vCPU, 16 GB) | ~€32/мес |
+| **OVH** | EU + Canada | `B3-32`: 8 vCPU, 32 GB RAM, 100 GB | ~€60/мес |
+| **DigitalOcean** | EU / US / SG | Premium AMD, 8 vCPU / 16 GB | ~$84/мес |
+| **Vultr High-Frequency** | глобально | 8 vCPU / 16 GB | ~$96/мес |
+
+**Рекомендация — Hetzner.** Лучшее соотношение цена / производительность,
+EU-юрисдикция, входящий трафик бесплатный, пиринг с Cloudflare стабилен.
+Добавьте Hetzner Object Storage или Backblaze B2 (~€5 / $6 за 1 ТБ) для
+медиа и Cloudflare (бесплатный план) перед сайтом — DDoS-фильтр + CDN +
+TLS из коробки.
+
+Минимальный production-конфиг под 100k активных:
+
+```
+Hetzner CCX23  (€30/мес)        — все контейнеры стека
+Hetzner Object Storage (~€5/мес) — фото/аудио/видео
+Cloudflare Free                 — CDN + TLS + WAF
+                            ───────────────────
+                            Итого ≈ €35/мес
+```
+
+При росте до ~500k активных — выносим Postgres на отдельный CCX23,
+поднимаем второй web-нод за тем же nginx, переключаем медиа на R2.
 
 ## Структура
 
 ```
-dvorik/      — Django-проект (settings, urls, range-aware media serve, Cyrillic LOWER)
+dvorik/      — Django-проект (settings, urls, range-aware dev media, Cyrillic LOWER, /healthz/)
 accounts/    — кастомный User
 profiles/    — Profile, приватность, last_seen middleware
 friends/     — Friendship, заявки, поиск
@@ -121,5 +184,6 @@ groups/      — Group + GroupMember
 feed/        — лента новостей
 templates/   — Django-шаблоны, base.html с шапкой, сайдбаром, плеером, модалкой
 static/      — CSS / JS / placeholder-картинки
-Dockerfile, docker-compose.yml, nginx.conf — production-стек
+scripts/backup.sh — cron-friendly бэкап Postgres + media
+Dockerfile, docker-compose.yml, nginx.conf, proxy.inc — production-стек
 ```

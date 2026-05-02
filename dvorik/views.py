@@ -1,3 +1,5 @@
+from django.db import connection
+from django.http import JsonResponse
 from django.shortcuts import render
 
 
@@ -11,3 +13,14 @@ def handler500(request):
 
 def handler403(request, exception):
     return render(request, '403.html', status=403)
+
+
+def healthz(request):
+    """Liveness/readiness probe — verifies DB connectivity."""
+    try:
+        with connection.cursor() as cur:
+            cur.execute('SELECT 1')
+            cur.fetchone()
+    except Exception as exc:
+        return JsonResponse({'ok': False, 'error': str(exc)}, status=503)
+    return JsonResponse({'ok': True})
