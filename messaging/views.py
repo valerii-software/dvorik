@@ -68,13 +68,20 @@ def _render_chat(request, dialog):
     dialog.messages.filter(read=False).exclude(sender=request.user).update(read=True)
     msgs = dialog.messages.select_related('sender', 'sender__profile').all()
     members = list(dialog.participants.select_related('profile').all())
+    is_creator = dialog.is_group and dialog.created_by_id == request.user.id
+    addable = []
+    if is_creator:
+        member_ids = {m.id for m in members}
+        addable = [f for f in Friendship.friends_qs(request.user) if f.id not in member_ids]
     return render(request, 'messaging/dialog.html', {
         'section': 'messages',
         'dialog': dialog,
         'other': dialog.other(request.user),
         'is_group': dialog.is_group,
+        'is_creator': is_creator,
         'title': dialog.title_for(request.user),
         'members': members,
+        'addable_friends': addable,
         'messages_list': msgs,
     })
 
@@ -144,3 +151,30 @@ def leave_chat(request, dialog_id):
         dialog.participants.remove(request.user)
         flash.info(request, f'Вы покинули чат «{dialog.name}».')
     return redirect('messaging:inbox')
+
+
+@login_required
+@require_POST
+def add_members(request, dialog_id):
+    dialog = get_object_or_404(Dialog, pk=dialog_id)
+    if not dialog.is_group or dialog.created_by_id != request.user.id:
+        return redirect('messaging:open_chat', dialog_id=dialog.id)
+    member_ids = [int(i) for i in request.POST.getlist('members') if i.isdigit()]
+    friend_ids = {f.id for f in Friendship.friends_qs(request.user)}
+    valid = [i for i in member_ids if i in friend_ids]
+    if valid:
+        dialog.participants.add(*valid)
+        flash.success(request, f'Добавлено: {len(valid)}.')
+    return redirect('messaging:open_chat', dialog_id=dialog.id)
+
+
+@login_required
+@require_POST
+def remove_member(request, dialog_id, user_id):
+    dialog = get_object_or_404(Dialog, pk=dialog_id)
+    if not dialog.is_group or dialog.created_by_id != request.user.id:
+        return redirect('messaging:open_chat', dialog_id=dialog.id)
+    if user_id == request.user.id:
+        return redirect('messaging:open_chat', dialog_id=dialog.id)
+    dialog.participants.remove(user_id)
+    return redirect('messaging:open_chat', dialog_id=dialog.id)

@@ -593,6 +593,22 @@ textarea { resize: vertical; }
   border: 1px solid #ABB6C2;
   object-fit: cover;
 }
+.chat-member > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  text-decoration: none;
+  color: #2B587A;
+}
+.chat-member > a:hover { text-decoration: underline; }
+.chat-add-form {
+  margin-bottom: 10px;
+  padding: 6px 8px;
+  background: #FFFCE5;
+  border: 1px solid #E6D77A;
+  font-size: 11px;
+}
+.chat-add-form label { display: inline-block; }
 
 /* ===== Photo albums ===== */
 .album-grid {

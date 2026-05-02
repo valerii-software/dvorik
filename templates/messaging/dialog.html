@@ -9,10 +9,17 @@
   </div>
   <div class="chat-members">
     {% for m in members %}
-      <a class="chat-member" href="{% url 'profiles:view' m.id %}">
-        <img src="{{ m.profile.avatar_url }}" alt="">
-        <span>{{ m.first_name }} {{ m.last_name }}</span>
-      </a>
+      <span class="chat-member">
+        <a href="{% url 'profiles:view' m.id %}">
+          <img src="{{ m.profile.avatar_url }}" alt="">
+          <span>{{ m.first_name }} {{ m.last_name }}</span>
+        </a>
+        {% if is_creator and m.id != request.user.id %}
+          <form method="post" action="{% url 'messaging:remove_member' dialog.id m.id %}" style="display:inline" onsubmit="return confirm('Удалить {{ m.get_full_name }} из чата?')">
+            {% csrf_token %}<button class="link-btn" type="submit" title="Удалить из чата">×</button>
+          </form>
+        {% endif %}
+      </span>
     {% endfor %}
     {% if request.user in members %}
       <form method="post" action="{% url 'messaging:leave_chat' dialog.id %}" style="display:inline-block; margin-left:8px" onsubmit="return confirm('Покинуть чат?')">
@@ -20,6 +27,19 @@
       </form>
     {% endif %}
   </div>
+  {% if is_creator and addable_friends %}
+    <form method="post" action="{% url 'messaging:add_members' dialog.id %}" class="chat-add-form">
+      {% csrf_token %}
+      <span class="muted">Добавить:</span>
+      {% for f in addable_friends %}
+        <label style="margin:0 8px 0 0">
+          <input type="checkbox" name="members" value="{{ f.id }}">
+          {{ f.first_name }} {{ f.last_name }}
+        </label>
+      {% endfor %}
+      <button class="btn" type="submit">Добавить</button>
+    </form>
+  {% endif %}
 {% else %}
   <h1>Переписка с <a href="{% url 'profiles:view' other.id %}">{{ other.get_full_name }}</a></h1>
   <div style="margin-bottom:8px"><a href="{% url 'messaging:inbox' %}">← Все диалоги</a></div>
