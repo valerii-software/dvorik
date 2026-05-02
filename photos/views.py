@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
 from friends.models import Friendship
+from profiles.permissions import can_view
 
 from .forms import AlbumForm, PhotoCommentForm, PhotoUploadForm
 from .models import Album, Photo, PhotoComment, PhotoTag
@@ -20,6 +21,11 @@ def my_albums(request):
 @login_required
 def user_albums(request, user_id):
     user = get_object_or_404(User, pk=user_id)
+    if not can_view(request.user, user, user.profile.privacy_photos):
+        return render(request, 'profiles/denied.html', {
+            'pageuser': user,
+            'message': 'Фотографии этого пользователя скрыты настройками приватности.',
+        }, status=403)
     albums = Album.objects.filter(owner=user)
     return render(request, 'photos/albums.html', {
         'section': 'photos' if user.id == request.user.id else None,
@@ -32,6 +38,11 @@ def user_albums(request, user_id):
 @login_required
 def album_view(request, album_id):
     album = get_object_or_404(Album, pk=album_id)
+    if not can_view(request.user, album.owner, album.owner.profile.privacy_photos):
+        return render(request, 'profiles/denied.html', {
+            'pageuser': album.owner,
+            'message': 'Фотографии этого пользователя скрыты настройками приватности.',
+        }, status=403)
     photos = album.photos.all()
     return render(request, 'photos/album.html', {
         'section': 'photos' if album.owner_id == request.user.id else None,
@@ -44,6 +55,11 @@ def album_view(request, album_id):
 @login_required
 def photo_view(request, photo_id):
     photo = get_object_or_404(Photo.objects.select_related('album', 'album__owner'), pk=photo_id)
+    if not can_view(request.user, photo.album.owner, photo.album.owner.profile.privacy_photos):
+        return render(request, 'profiles/denied.html', {
+            'pageuser': photo.album.owner,
+            'message': 'Фотография скрыта настройками приватности.',
+        }, status=403)
     prev_id, next_id = photo.neighbours()
     is_owner = photo.album.owner_id == request.user.id
     friends = Friendship.friends_qs(request.user)

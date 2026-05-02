@@ -4,6 +4,8 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
+from profiles.permissions import can_view
+
 from .forms import VideoUploadForm
 from .models import Video
 
@@ -18,6 +20,11 @@ def my_videos(request):
 @login_required
 def user_videos(request, user_id):
     user = get_object_or_404(User, pk=user_id)
+    if not can_view(request.user, user, user.profile.privacy_video):
+        return render(request, 'profiles/denied.html', {
+            'pageuser': user,
+            'message': 'Видеозаписи этого пользователя скрыты настройками приватности.',
+        }, status=403)
     videos = Video.objects.filter(owner=user)
     return render(request, 'video/list.html', {
         'section': 'video' if user.id == request.user.id else None,
@@ -30,6 +37,11 @@ def user_videos(request, user_id):
 @login_required
 def view_video(request, video_id):
     video = get_object_or_404(Video.objects.select_related('owner'), pk=video_id)
+    if not can_view(request.user, video.owner, video.owner.profile.privacy_video):
+        return render(request, 'profiles/denied.html', {
+            'pageuser': video.owner,
+            'message': 'Видеозапись скрыта настройками приватности.',
+        }, status=403)
     return render(request, 'video/view.html', {
         'section': 'video' if video.owner_id == request.user.id else None,
         'video': video,

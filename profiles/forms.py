@@ -3,6 +3,16 @@ from django import forms
 from .models import Profile
 
 
+class PrivacyForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = (
+            'privacy_profile', 'privacy_wall_view', 'privacy_wall_post',
+            'privacy_photos', 'privacy_audio', 'privacy_video',
+            'privacy_groups', 'privacy_messages',
+        )
+
+
 class ProfileForm(forms.ModelForm):
     first_name = forms.CharField(label='Имя', max_length=30)
     last_name = forms.CharField(label='Фамилия', max_length=30)

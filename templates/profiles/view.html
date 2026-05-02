@@ -15,7 +15,7 @@
         {% if friend_state == 'friends' %}
           <span class="muted">Вы друзья</span>
           {% include 'friends/_btn.html' with action='remove' label='удалить из друзей' uid=pageuser.id %}
-          <a href="{% url 'messaging:open' pageuser.id %}">написать сообщение</a>
+          {% if can_message %}<a href="{% url 'messaging:open' pageuser.id %}">написать сообщение</a>{% endif %}
         {% elif friend_state == 'sent' %}
           <span class="muted">Заявка отправлена</span>
           {% include 'friends/_btn.html' with action='cancel' label='отменить заявку' uid=pageuser.id %}
@@ -24,7 +24,7 @@
           {% include 'friends/_btn.html' with action='reject' label='отклонить' uid=pageuser.id %}
         {% else %}
           {% include 'friends/_btn.html' with action='add' label='добавить в друзья' uid=pageuser.id %}
-          <a href="{% url 'messaging:open' pageuser.id %}">написать сообщение</a>
+          {% if can_message %}<a href="{% url 'messaging:open' pageuser.id %}">написать сообщение</a>{% endif %}
         {% endif %}
       {% endif %}
     </div>
@@ -67,7 +67,7 @@
   <div class="empty">Друзей пока нет.</div>
 {% endif %}
 
-{% if recent_photos %}
+{% if can_view_photos and recent_photos %}
   <h2>Фотографии ({{ album_count }} {% if album_count == 1 %}альбом{% elif album_count < 5 %}альбома{% else %}альбомов{% endif %})</h2>
   <div class="photo-grid">
     {% for p in recent_photos %}
@@ -79,7 +79,7 @@
   <div style="margin-top:6px"><a href="{% url 'photos:user_albums' pageuser.id %}">Все фотографии →</a></div>
 {% endif %}
 
-{% if photos_with_user %}
+{% if can_view_photos and photos_with_user %}
   <h2>Фото с {{ pageuser.first_name }}</h2>
   <div class="photo-grid">
     {% for p in photos_with_user %}
@@ -90,7 +90,7 @@
   </div>
 {% endif %}
 
-{% if user_groups %}
+{% if can_view_groups and user_groups %}
   <h2>Группы</h2>
   <div class="friend-grid">
     {% for g in user_groups %}
@@ -103,7 +103,14 @@
   <div style="margin-top:6px"><a href="{% url 'groups:user_groups' pageuser.id %}">Все группы →</a></div>
 {% endif %}
 
-<h2>Стена</h2>
-{% include 'wall/_wall.html' with posts=posts owner=pageuser wall_form=wall_form %}
+{% if can_view_wall %}
+  <h2>Стена</h2>
+  {% if can_post_wall or is_me %}
+    {% include 'wall/_wall.html' with posts=posts owner=pageuser wall_form=wall_form %}
+  {% else %}
+    {% include 'wall/_posts.html' with posts=posts owner=pageuser %}
+    <div class="muted" style="margin-top:6px">Писать на стену могут только указанные пользователи.</div>
+  {% endif %}
+{% endif %}
 
 {% endblock %}

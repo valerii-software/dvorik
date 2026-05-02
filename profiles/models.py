@@ -2,6 +2,13 @@ from django.conf import settings
 from django.db import models
 
 
+PRIVACY_CHOICES = [
+    ('all', 'все'),
+    ('friends', 'только друзья'),
+    ('me', 'только я'),
+]
+
+
 class Profile(models.Model):
     GENDER = [('m', 'мужской'), ('f', 'женский'), ('', 'не указан')]
     MARITAL = [
@@ -38,6 +45,23 @@ class Profile(models.Model):
     skype = models.CharField('Skype', max_length=80, blank=True)
     icq = models.CharField('ICQ', max_length=20, blank=True)
     site = models.CharField('сайт', max_length=200, blank=True)
+
+    privacy_profile = models.CharField('кто видит мою страницу', max_length=10,
+                                       choices=PRIVACY_CHOICES, default='all')
+    privacy_wall_view = models.CharField('кто видит мою стену', max_length=10,
+                                         choices=PRIVACY_CHOICES, default='all')
+    privacy_wall_post = models.CharField('кто может писать на стену', max_length=10,
+                                         choices=PRIVACY_CHOICES, default='all')
+    privacy_photos = models.CharField('кто видит мои фотографии', max_length=10,
+                                      choices=PRIVACY_CHOICES, default='all')
+    privacy_audio = models.CharField('кто видит мои аудиозаписи', max_length=10,
+                                     choices=PRIVACY_CHOICES, default='all')
+    privacy_video = models.CharField('кто видит мои видеозаписи', max_length=10,
+                                     choices=PRIVACY_CHOICES, default='all')
+    privacy_groups = models.CharField('кто видит мои группы', max_length=10,
+                                      choices=PRIVACY_CHOICES, default='all')
+    privacy_messages = models.CharField('кто может писать мне', max_length=10,
+                                        choices=PRIVACY_CHOICES, default='all')
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

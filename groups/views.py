@@ -5,6 +5,7 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
+from profiles.permissions import can_view
 from wall.forms import WallPostForm
 from wall.models import WallPost
 
@@ -35,6 +36,11 @@ def my_groups(request):
 @login_required
 def user_groups(request, user_id):
     user = get_object_or_404(User, pk=user_id)
+    if not can_view(request.user, user, user.profile.privacy_groups):
+        return render(request, 'profiles/denied.html', {
+            'pageuser': user,
+            'message': 'Группы этого пользователя скрыты настройками приватности.',
+        }, status=403)
     group_ids = list(GroupMember.objects.filter(user=user).values_list('group_id', flat=True))
     groups = Group.objects.filter(id__in=group_ids)
     return render(request, 'groups/list.html', {

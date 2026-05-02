@@ -5,6 +5,8 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
+from profiles.permissions import can_view
+
 from .forms import AudioUploadForm
 from .models import AudioTrack, UserAudio
 
@@ -19,6 +21,11 @@ def my_audio(request):
 @login_required
 def user_audio(request, user_id):
     user = get_object_or_404(User, pk=user_id)
+    if not can_view(request.user, user, user.profile.privacy_audio):
+        return render(request, 'profiles/denied.html', {
+            'pageuser': user,
+            'message': 'Аудиозаписи этого пользователя скрыты настройками приватности.',
+        }, status=403)
     items = UserAudio.objects.filter(user=user).select_related('track', 'track__uploader')
     my_track_ids = set(
         UserAudio.objects.filter(user=request.user).values_list('track_id', flat=True)

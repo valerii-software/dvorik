@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}Доступ закрыт — ВКонтакте{% endblock %}
+{% block content %}
+<h1>Доступ закрыт</h1>
+<div class="empty" style="font-style:normal">
+  {{ message|default:"Это содержимое доступно только указанному кругу пользователей." }}
+</div>
+<div style="margin-top:8px"><a href="{% url 'profiles:view' pageuser.id %}">← К странице пользователя</a></div>
+{% endblock %}

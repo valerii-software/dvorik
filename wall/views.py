@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
 from groups.models import Group
+from profiles.permissions import can_view
 
 from .forms import WallCommentForm, WallPostForm
 from .models import WallPost
@@ -31,6 +32,8 @@ def _redirect_to_target(wp):
 @require_POST
 def post(request, owner_id):
     owner = get_object_or_404(User, pk=owner_id)
+    if not can_view(request.user, owner, owner.profile.privacy_wall_post):
+        return redirect('profiles:view', user_id=owner_id)
     form = WallPostForm(request.POST)
     if form.is_valid():
         wp = form.save(commit=False)
@@ -76,6 +79,8 @@ def delete_post(request, post_id):
 @require_POST
 def comment(request, post_id):
     wp = get_object_or_404(WallPost, pk=post_id)
+    if wp.owner_id and not can_view(request.user, wp.owner, wp.owner.profile.privacy_wall_view):
+        return _redirect_to_target(wp)
     form = WallCommentForm(request.POST)
     if form.is_valid():
         c = form.save(commit=False)
