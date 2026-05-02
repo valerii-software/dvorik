@@ -63,6 +63,8 @@ class Profile(models.Model):
     privacy_messages = models.CharField('кто может писать мне', max_length=10,
                                         choices=PRIVACY_CHOICES, default='all')
 
+    last_seen = models.DateTimeField(null=True, blank=True, db_index=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

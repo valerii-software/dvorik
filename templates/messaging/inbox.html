@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load profile_extras %}
 {% block title %}Мои сообщения — ВКонтакте{% endblock %}
 
 {% block content %}
@@ -11,7 +12,10 @@
         <div class="dialog-row {% if r.unread %}unread{% endif %}">
           <img class="ava" src="{{ r.other.profile.avatar_url }}">
           <div class="body">
-            <div>{{ r.other.get_full_name }}</div>
+            <div>
+              {% if r.other.profile|is_online %}<span class="online-dot"></span>{% endif %}
+              {{ r.other.get_full_name }}
+            </div>
             <div class="preview">{% if r.last %}{{ r.last.text|truncatechars:80 }}{% else %}—{% endif %}</div>
           </div>
           {% if r.last %}<div class="muted" style="white-space:nowrap">{{ r.last.created_at|date:"j M H:i" }}</div>{% endif %}

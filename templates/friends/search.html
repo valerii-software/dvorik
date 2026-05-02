@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load profile_extras %}
 {% block title %}Поиск людей — ВКонтакте{% endblock %}
 
 {% block content %}
@@ -19,20 +20,48 @@
   </div>
 </form>
 
-{% if q or city %}
-  <h2>Результаты ({{ results|length }})</h2>
-  {% if results %}
-    {% for u in results %}
-      <div class="friend-row">
-        <a href="{% url 'profiles:view' u.id %}"><img class="ava" src="{{ u.profile.avatar_url }}"></a>
-        <div class="body">
-          <a href="{% url 'profiles:view' u.id %}"><b>{{ u.get_full_name|default:u.email }}</b></a>
-          {% if u.profile.home_city %}<div class="muted">{{ u.profile.home_city }}</div>{% endif %}
-        </div>
+<h2>
+  {% if has_query %}Результаты{% else %}Все пользователи{% endif %}
+  ({{ total }})
+</h2>
+
+{% if page.object_list %}
+  {% for u in page.object_list %}
+    <div class="friend-row">
+      <a href="{% url 'profiles:view' u.id %}"><img class="ava" src="{{ u.profile.avatar_url }}"></a>
+      <div class="body">
+        {% if u.profile|is_online %}<span class="online-dot" title="online"></span>{% endif %}
+        <a href="{% url 'profiles:view' u.id %}"><b>{{ u.get_full_name|default:u.email }}</b></a>
+        {% if not u.profile|is_online and u.profile.last_seen %}
+          <span class="last-seen">· {{ u.profile|last_seen_label }}</span>
+        {% endif %}
+        {% if u.profile.home_city %}<div class="muted">{{ u.profile.home_city }}</div>{% endif %}
       </div>
-    {% endfor %}
-  {% else %}
-    <div class="empty">Ничего не найдено.</div>
+    </div>
+  {% endfor %}
+
+  {% if page.paginator.num_pages > 1 %}
+    <div class="pagination">
+      {% if page.has_previous %}
+        <a href="?{% if q %}q={{ q }}&{% endif %}{% if city %}city={{ city }}&{% endif %}page={{ page.previous_page_number }}">←</a>
+      {% else %}
+        <span class="disabled">←</span>
+      {% endif %}
+      {% for n in page.paginator.page_range %}
+        {% if n == page.number %}
+          <span class="current">{{ n }}</span>
+        {% else %}
+          <a href="?{% if q %}q={{ q }}&{% endif %}{% if city %}city={{ city }}&{% endif %}page={{ n }}">{{ n }}</a>
+        {% endif %}
+      {% endfor %}
+      {% if page.has_next %}
+        <a href="?{% if q %}q={{ q }}&{% endif %}{% if city %}city={{ city }}&{% endif %}page={{ page.next_page_number }}">→</a>
+      {% else %}
+        <span class="disabled">→</span>
+      {% endif %}
+    </div>
   {% endif %}
+{% else %}
+  <div class="empty">Ничего не найдено.</div>
 {% endif %}
 {% endblock %}

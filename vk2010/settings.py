@@ -43,6 +43,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'profiles.middleware.LastSeenMiddleware',
 ]
 
 ROOT_URLCONF = 'vk2010.urls'
@@ -58,6 +59,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'accounts.context_processors.user_counter',
+                'profiles.context_processors.notifications',
             ],
         },
     },

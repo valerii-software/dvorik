@@ -1,7 +1,9 @@
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
+from django.core.paginator import Paginator
+from django.db.models import Q, Value
+from django.db.models.functions import Concat, Lower
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
@@ -48,20 +50,29 @@ def requests_view(request):
 def search(request):
     q = request.GET.get('q', '').strip()
     city = request.GET.get('city', '').strip()
-    results = User.objects.none()
-    if q or city:
-        qs = User.objects.exclude(id=request.user.id).select_related('profile')
-        if q:
-            for token in q.split():
-                qs = qs.filter(Q(first_name__icontains=token) | Q(last_name__icontains=token))
-        if city:
-            qs = qs.filter(profile__home_city__icontains=city)
-        results = qs[:50]
+    qs = (
+        User.objects
+        .exclude(id=request.user.id)
+        .select_related('profile')
+        .annotate(name_lower=Lower(Concat('first_name', Value(' '), 'last_name')))
+        .order_by('first_name', 'last_name', 'id')
+    )
+    if q:
+        for token in q.split():
+            qs = qs.filter(name_lower__contains=token.lower())
+    if city:
+        qs = qs.annotate(city_lower=Lower('profile__home_city')).filter(city_lower__contains=city.lower())
+
+    paginator = Paginator(qs, 20)
+    page = paginator.get_page(request.GET.get('page'))
+
     return render(request, 'friends/search.html', {
         'section': 'search',
         'q': q,
         'city': city,
-        'results': results,
+        'page': page,
+        'total': paginator.count,
+        'has_query': bool(q or city),
     })
 
 
