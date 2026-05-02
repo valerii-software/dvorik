@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 
@@ -42,10 +41,6 @@ class WallPost(models.Model):
     def __str__(self):
         target = f'user {self.owner_id}' if self.owner_id else f'group {self.group_id}'
         return f'wallpost #{self.pk} on {target} by {self.author_id}'
-
-    def clean(self):
-        if bool(self.owner_id) == bool(self.group_id):
-            raise ValidationError('Set either owner or group, not both.')
 
     @property
     def is_group_post(self):
