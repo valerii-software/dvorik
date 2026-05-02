@@ -243,7 +243,7 @@ textarea { resize: vertical; }
 .form-error { color: #b00; margin-bottom: 8px; }
 
 /* ===== Profile ===== */
-.profile-grid { display: flex; gap: 14px; }
+.profile-grid { display: flex; gap: 14px; align-items: flex-start; }
 .profile-photo {
   width: 200px;
   flex-shrink: 0;
@@ -252,6 +252,51 @@ textarea { resize: vertical; }
   width: 200px;
   border: 1px solid #ABB6C2;
   display: block;
+}
+
+/* Side blocks (Друзья, Друзья онлайн, Группы) under the avatar */
+.side-block {
+  margin-top: 10px;
+}
+.side-block-header {
+  background: #F4F7FA;
+  border-top: 1px solid #DAE1E8;
+  border-bottom: 1px solid #DAE1E8;
+  padding: 3px 6px;
+  font-weight: bold;
+  color: #2B587A;
+  position: relative;
+  font-size: 11px;
+}
+.side-block-header .side-link {
+  position: absolute;
+  right: 6px;
+  top: 3px;
+  font-weight: normal;
+  font-size: 10px;
+}
+.mini-friend-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  padding: 6px 0 4px;
+}
+.mini-friend {
+  text-align: center;
+}
+.mini-friend img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border: 1px solid #ABB6C2;
+  display: block;
+  margin: 0 auto;
+}
+.mini-friend .name {
+  display: block;
+  margin-top: 2px;
+  font-size: 10px;
+  line-height: 1.1;
 }
 .profile-info { flex: 1; min-width: 0; position: relative; }
 .profile-info table.profile-facts { border-collapse: collapse; width: 100%; }

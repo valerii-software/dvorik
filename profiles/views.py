@@ -3,6 +3,10 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
+from datetime import timedelta
+
+from django.utils import timezone
+
 from friends.models import Friendship
 from groups.models import Group
 from photos.models import Album, Photo
@@ -39,8 +43,13 @@ def view_profile(request, user_id):
         })
 
     friend_state = Friendship.state_between(request.user, user) if not is_me else None
-    friend_count = Friendship.friends_qs(user).count()
-    friends_preview = Friendship.friends_qs(user)[:6]
+    friends_qs = Friendship.friends_qs(user)
+    friend_count = friends_qs.count()
+    friends_preview = friends_qs[:6]
+    online_threshold = timezone.now() - timedelta(minutes=5)
+    friends_online = friends_qs.filter(profile__last_seen__gte=online_threshold)
+    friends_online_count = friends_online.count()
+    friends_online_preview = friends_online[:6]
 
     posts = WallPost.objects.none()
     if flags['can_view_wall']:
@@ -64,6 +73,8 @@ def view_profile(request, user_id):
         'friend_state': friend_state,
         'friend_count': friend_count,
         'friends_preview': friends_preview,
+        'friends_online_count': friends_online_count,
+        'friends_online_preview': friends_online_preview,
         'posts': posts,
         'wall_form': WallPostForm(),
         'album_count': album_count,

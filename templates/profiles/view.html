@@ -15,17 +15,6 @@
 <div class="profile-grid">
   <div class="profile-photo">
     <img src="{{ profile.avatar_url }}" alt="">
-    {% if is_me and completion and completion.percent < 100 %}
-      <div class="completion">
-        <div class="completion-bar"><div class="completion-fill" style="width:{{ completion.percent }}%"></div></div>
-        <div class="completion-percent">{{ completion.percent }}%</div>
-        <ul class="completion-list">
-          {% for label, points in completion.missing|slice:":4" %}
-            <li><a href="{% url 'profiles:edit' %}">{{ label }}</a> <span class="muted">(+{{ points }}%)</span></li>
-          {% endfor %}
-        </ul>
-      </div>
-    {% endif %}
 
     <div class="profile-actions">
       {% if is_me %}
@@ -46,6 +35,70 @@
         {% if can_message %}<a href="{% url 'messaging:open' pageuser.id %}">написать сообщение</a>{% endif %}
       {% endif %}
     </div>
+
+    {% if is_me and completion and completion.percent < 100 %}
+      <div class="completion">
+        <div class="completion-bar"><div class="completion-fill" style="width:{{ completion.percent }}%"></div></div>
+        <div class="completion-percent">{{ completion.percent }}%</div>
+        <ul class="completion-list">
+          {% for label, points in completion.missing|slice:":4" %}
+            <li><a href="{% url 'profiles:edit' %}">{{ label }}</a> <span class="muted">(+{{ points }}%)</span></li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <div class="side-block">
+      <div class="side-block-header">
+        Друзья ({{ friend_count }})
+        <a class="side-link" href="{% url 'friends:user_friends' pageuser.id %}">все</a>
+      </div>
+      {% if friends_preview %}
+        <div class="mini-friend-grid">
+          {% for f in friends_preview %}
+            <div class="mini-friend">
+              <a href="{% url 'profiles:view' f.id %}"><img src="{{ f.profile.avatar_url }}" alt=""></a>
+              <a class="name" href="{% url 'profiles:view' f.id %}">{{ f.first_name }} {{ f.last_name }}</a>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty">Нет друзей.</div>
+      {% endif %}
+    </div>
+
+    {% if friends_online_count %}
+      <div class="side-block">
+        <div class="side-block-header">
+          Друзья онлайн ({{ friends_online_count }})
+        </div>
+        <div class="mini-friend-grid">
+          {% for f in friends_online_preview %}
+            <div class="mini-friend">
+              <a href="{% url 'profiles:view' f.id %}"><img src="{{ f.profile.avatar_url }}" alt=""></a>
+              <a class="name" href="{% url 'profiles:view' f.id %}">{{ f.first_name }} {{ f.last_name }}</a>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    {% if can_view_groups and user_groups %}
+      <div class="side-block">
+        <div class="side-block-header">
+          Группы
+          <a class="side-link" href="{% url 'groups:user_groups' pageuser.id %}">все</a>
+        </div>
+        <div class="mini-friend-grid">
+          {% for g in user_groups %}
+            <div class="mini-friend">
+              <a href="{% url 'groups:view' g.id %}"><img src="{{ g.avatar_url }}" alt=""></a>
+              <a class="name" href="{% url 'groups:view' g.id %}">{{ g.name }}</a>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
   </div>
 
   <div class="profile-info">
@@ -96,68 +149,40 @@
         {% endif %}
       </div>
     {% endif %}
+
+    {% if can_view_photos and recent_photos %}
+      <h2>Фотографии ({{ album_count }})</h2>
+      <div class="photo-grid">
+        {% for p in recent_photos %}
+          <a class="photo-thumb" href="{% url 'photos:photo' p.id %}">
+            <img src="{{ p.thumbnail.url|default:p.image.url }}" alt="">
+          </a>
+        {% endfor %}
+      </div>
+      <div style="margin-top:6px"><a href="{% url 'photos:user_albums' pageuser.id %}">Все фотографии →</a></div>
+    {% endif %}
+
+    {% if can_view_photos and photos_with_user %}
+      <h2>Фото с {{ pageuser.first_name }}</h2>
+      <div class="photo-grid">
+        {% for p in photos_with_user %}
+          <a class="photo-thumb" href="{% url 'photos:photo' p.id %}">
+            <img src="{{ p.thumbnail.url|default:p.image.url }}" alt="">
+          </a>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% if can_view_wall %}
+      <h2>Стена</h2>
+      {% if can_post_wall or is_me %}
+        {% include 'wall/_wall.html' with posts=posts owner=pageuser wall_form=wall_form %}
+      {% else %}
+        {% include 'wall/_posts.html' with posts=posts owner=pageuser %}
+        <div class="muted" style="margin-top:6px">Писать на стену могут только указанные пользователи.</div>
+      {% endif %}
+    {% endif %}
   </div>
 </div>
-
-<h2>Друзья ({{ friend_count }})</h2>
-{% if friends_preview %}
-  <div class="friend-grid">
-    {% for f in friends_preview %}
-      <div class="friend-card">
-        <a href="{% url 'profiles:view' f.id %}"><img src="{{ f.profile.avatar_url }}" alt=""></a>
-        <a class="name" href="{% url 'profiles:view' f.id %}">{{ f.first_name }} {{ f.last_name }}</a>
-      </div>
-    {% endfor %}
-  </div>
-  <div style="margin-top:6px"><a href="{% url 'friends:user_friends' pageuser.id %}">Все друзья →</a></div>
-{% else %}
-  <div class="empty">Друзей пока нет.</div>
-{% endif %}
-
-{% if can_view_photos and recent_photos %}
-  <h2>Фотографии ({{ album_count }} {% if album_count == 1 %}альбом{% elif album_count < 5 %}альбома{% else %}альбомов{% endif %})</h2>
-  <div class="photo-grid">
-    {% for p in recent_photos %}
-      <a class="photo-thumb" href="{% url 'photos:photo' p.id %}">
-        <img src="{{ p.thumbnail.url|default:p.image.url }}" alt="">
-      </a>
-    {% endfor %}
-  </div>
-  <div style="margin-top:6px"><a href="{% url 'photos:user_albums' pageuser.id %}">Все фотографии →</a></div>
-{% endif %}
-
-{% if can_view_photos and photos_with_user %}
-  <h2>Фото с {{ pageuser.first_name }}</h2>
-  <div class="photo-grid">
-    {% for p in photos_with_user %}
-      <a class="photo-thumb" href="{% url 'photos:photo' p.id %}">
-        <img src="{{ p.thumbnail.url|default:p.image.url }}" alt="">
-      </a>
-    {% endfor %}
-  </div>
-{% endif %}
-
-{% if can_view_groups and user_groups %}
-  <h2>Группы</h2>
-  <div class="friend-grid">
-    {% for g in user_groups %}
-      <div class="friend-card">
-        <a href="{% url 'groups:view' g.id %}"><img src="{{ g.avatar_url }}" alt=""></a>
-        <a class="name" href="{% url 'groups:view' g.id %}">{{ g.name }}</a>
-      </div>
-    {% endfor %}
-  </div>
-  <div style="margin-top:6px"><a href="{% url 'groups:user_groups' pageuser.id %}">Все группы →</a></div>
-{% endif %}
-
-{% if can_view_wall %}
-  <h2>Стена</h2>
-  {% if can_post_wall or is_me %}
-    {% include 'wall/_wall.html' with posts=posts owner=pageuser wall_form=wall_form %}
-  {% else %}
-    {% include 'wall/_posts.html' with posts=posts owner=pageuser %}
-    <div class="muted" style="margin-top:6px">Писать на стену могут только указанные пользователи.</div>
-  {% endif %}
-{% endif %}
 
 {% endblock %}
