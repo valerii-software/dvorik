@@ -99,13 +99,33 @@
   const content = document.getElementById('modal-content');
   function open() { overlay.hidden = false; }
   function close() { overlay.hidden = true; content.innerHTML = ''; }
+
+  function loadInto(url) {
+    open();
+    content.innerHTML = '<div class="muted" style="padding:20px">Загрузка…</div>';
+    fetch(url, { headers: { 'HX-Request': 'true' }, credentials: 'same-origin' })
+      .then(function (r) { return r.text(); })
+      .then(function (html) {
+        content.innerHTML = html;
+        if (window.__initGraffiti) window.__initGraffiti();
+      })
+      .catch(function () {
+        content.innerHTML = '<div class="muted" style="padding:20px">Ошибка загрузки.</div>';
+      });
+  }
+
   document.addEventListener('click', function (e) {
     if (e.target === overlay || e.target.closest('[data-modal-close]')) {
       e.preventDefault();
       close();
+      return;
     }
-    if (e.target.closest('[data-modal-open]')) {
-      open();
+    const opener = e.target.closest('[data-modal-open]');
+    if (opener) {
+      e.preventDefault();
+      const url = opener.getAttribute('href') || opener.dataset.modalUrl;
+      if (url) loadInto(url);
+      else open();
     }
   });
   document.addEventListener('keydown', function (e) {
@@ -181,11 +201,6 @@ window.__initGraffiti = function () {
   });
 };
 
-document.body.addEventListener('htmx:afterSwap', function (e) {
-  if (e.detail && e.detail.target && e.detail.target.id === 'modal-content') {
-    window.__initGraffiti && window.__initGraffiti();
-  }
-});
 </script>
 
 </body>
