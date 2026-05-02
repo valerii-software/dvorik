@@ -1,7 +1,9 @@
 {% if group %}
   {% url 'wall:post_to_group' group.id as post_url %}
+  {% url 'wall:graffiti_group' group.id as graffiti_url %}
 {% else %}
   {% url 'wall:post' owner.id as post_url %}
+  {% url 'wall:graffiti_user' owner.id as graffiti_url %}
 {% endif %}
 <div class="wall-form">
   <form method="post" action="{{ post_url }}"
@@ -9,7 +11,10 @@
         hx-target="#wall-posts" hx-swap="outerHTML">
     {% csrf_token %}
     {{ wall_form.text }}
-    <div style="margin-top:4px"><button class="btn btn-primary" type="submit">Отправить</button></div>
+    <div style="margin-top:4px">
+      <button class="btn btn-primary" type="submit">Отправить</button>
+      &nbsp;<a href="{{ graffiti_url }}">Оставить граффити</a>
+    </div>
   </form>
 </div>
 

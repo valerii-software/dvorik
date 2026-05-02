@@ -23,7 +23,8 @@ class WallPost(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
         related_name='wall_posts_authored',
     )
-    text = models.TextField()
+    text = models.TextField(blank=True)
+    graffiti = models.ImageField(upload_to='graffiti/%Y/%m/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

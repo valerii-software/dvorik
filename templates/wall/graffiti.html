@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Граффити — ВКонтакте{% endblock %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+
+<div class="graffiti-toolbar">
+  <div class="palette" id="palette">
+    <button type="button" class="swatch active" data-color="#000000" style="background:#000000"></button>
+    <button type="button" class="swatch" data-color="#FFFFFF" style="background:#FFFFFF"></button>
+    <button type="button" class="swatch" data-color="#E03131" style="background:#E03131"></button>
+    <button type="button" class="swatch" data-color="#F08C00" style="background:#F08C00"></button>
+    <button type="button" class="swatch" data-color="#F5C518" style="background:#F5C518"></button>
+    <button type="button" class="swatch" data-color="#2F9E44" style="background:#2F9E44"></button>
+    <button type="button" class="swatch" data-color="#1971C2" style="background:#1971C2"></button>
+    <button type="button" class="swatch" data-color="#7048E8" style="background:#7048E8"></button>
+    <button type="button" class="swatch" data-color="#C92A86" style="background:#C92A86"></button>
+    <button type="button" class="swatch" data-color="#5C3A1E" style="background:#5C3A1E"></button>
+  </div>
+
+  <div class="brushes" id="brushes">
+    <button type="button" class="brush" data-size="2"><span style="width:2px;height:2px"></span></button>
+    <button type="button" class="brush active" data-size="4"><span style="width:4px;height:4px"></span></button>
+    <button type="button" class="brush" data-size="8"><span style="width:8px;height:8px"></span></button>
+    <button type="button" class="brush" data-size="14"><span style="width:14px;height:14px"></span></button>
+  </div>
+
+  <button type="button" class="btn" id="clear-btn">Очистить</button>
+</div>
+
+<canvas id="graffiti" width="586" height="408"></canvas>
+
+<form method="post" action="{{ save_url }}" id="save-form" style="margin-top:10px">
+  {% csrf_token %}
+  <input type="hidden" name="image_data" id="image-data">
+  <button class="btn btn-primary" type="submit">Сохранить на стену</button>
+  &nbsp;<a href="{{ cancel_url }}">Отмена</a>
+</form>
+
+<script src="{% static 'js/graffiti.js' %}"></script>
+{% endblock %}
