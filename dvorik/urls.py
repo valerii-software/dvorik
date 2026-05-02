@@ -26,6 +26,6 @@ if settings.DEBUG:
         re_path(r'^media/(?P<path>.+)$', media_views.serve_media),
     ]
 
-handler404 = 'vk2010.views.handler404'
-handler500 = 'vk2010.views.handler500'
-handler403 = 'vk2010.views.handler403'
+handler404 = 'dvorik.views.handler404'
+handler500 = 'dvorik.views.handler500'
+handler403 = 'dvorik.views.handler403'

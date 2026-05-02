@@ -7,4 +7,4 @@ class ProfilesConfig(AppConfig):
 
     def ready(self):
         from . import signals  # noqa: F401
-        from vk2010 import db_unicode  # noqa: F401
+        from dvorik import db_unicode  # noqa: F401

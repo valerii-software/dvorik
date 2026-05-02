@@ -1,4 +1,4 @@
-/* VK 2010 styles — Kashmir Blue #45668E, Tahoma 11px, white background */
+/* Дворик styles — Kashmir Blue #45668E, Tahoma 11px, white background */
 
 * { box-sizing: border-box; }
 
@@ -726,7 +726,7 @@ canvas#graffiti {
   padding-left: 60px;
 }
 
-/* ===== Audio (VK 2010 style) ===== */
+/* ===== Audio (retro player) ===== */
 .audio-row {
   display: flex;
   align-items: center;

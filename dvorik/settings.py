@@ -1,4 +1,4 @@
-"""Django settings for vk2010 project."""
+"""Django settings for dvorik project."""
 
 from pathlib import Path
 import os
@@ -46,7 +46,7 @@ MIDDLEWARE = [
     'profiles.middleware.LastSeenMiddleware',
 ]
 
-ROOT_URLCONF = 'vk2010.urls'
+ROOT_URLCONF = 'dvorik.urls'
 
 TEMPLATES = [
     {
@@ -65,7 +65,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'vk2010.wsgi.application'
+WSGI_APPLICATION = 'dvorik.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
