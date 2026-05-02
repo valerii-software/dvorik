@@ -10,4 +10,5 @@ urlpatterns = [
     path('user/<int:user_id>/', views.user_videos, name='user_videos'),
     path('<int:video_id>/', views.view_video, name='view'),
     path('<int:video_id>/delete/', views.delete_video, name='delete'),
+    path('<int:video_id>/comment/', views.comment, name='comment'),
 ]

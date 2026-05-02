@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Video
+from .models import Video, VideoComment
 
 
 MAX_VIDEO_SIZE = 100 * 1024 * 1024  # 100 MiB
@@ -27,3 +27,11 @@ class VideoUploadForm(forms.ModelForm):
                 f'Размер файла {mb:.1f} МБ превышает лимит в 100 МБ.'
             )
         return f
+
+
+class VideoCommentForm(forms.ModelForm):
+    class Meta:
+        model = VideoComment
+        fields = ('text',)
+        widgets = {'text': forms.TextInput(attrs={'placeholder': 'Комментарий…'})}
+        labels = {'text': ''}

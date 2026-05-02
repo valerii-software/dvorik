@@ -23,4 +23,24 @@
     {% csrf_token %}<button class="btn" type="submit">Удалить видео</button>
   </form>
 {% endif %}
+
+<h2>Комментарии</h2>
+{% for c in video.comments.all %}
+  <div class="comment">
+    <a href="{% url 'profiles:view' c.author.id %}"><img class="ava" src="{{ c.author.profile.avatar_url }}"></a>
+    <div>
+      <a href="{% url 'profiles:view' c.author.id %}"><b>{{ c.author.get_full_name }}</b></a>
+      <div class="text">{{ c.text|linebreaksbr }}</div>
+      <div class="meta">{{ c.created_at|date:"j E Y, H:i" }}</div>
+    </div>
+  </div>
+{% empty %}
+  <div class="muted">Комментариев пока нет.</div>
+{% endfor %}
+
+<form class="comment-form" method="post" action="{% url 'video:comment' video.id %}" style="margin-top:8px">
+  {% csrf_token %}
+  <input type="text" name="text" placeholder="Комментарий…" required>
+  <button class="btn" type="submit">→</button>
+</form>
 {% endblock %}

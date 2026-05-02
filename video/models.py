@@ -26,3 +26,16 @@ class Video(models.Model):
         if self.preview:
             return self.preview.url
         return '/static/img/no_video.png'
+
+
+class VideoComment(models.Model):
+    video = models.ForeignKey(Video, on_delete=models.CASCADE, related_name='comments')
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+        related_name='video_comments',
+    )
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['created_at']

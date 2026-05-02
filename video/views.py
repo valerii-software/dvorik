@@ -6,7 +6,7 @@ from django.views.decorators.http import require_POST
 
 from profiles.permissions import can_view
 
-from .forms import VideoUploadForm
+from .forms import VideoCommentForm, VideoUploadForm
 from .models import Video
 
 User = get_user_model()
@@ -46,6 +46,7 @@ def view_video(request, video_id):
         'section': 'video' if video.owner_id == request.user.id else None,
         'video': video,
         'is_owner': video.owner_id == request.user.id,
+        'comment_form': VideoCommentForm(),
     })
 
 
@@ -74,3 +75,18 @@ def delete_video(request, video_id):
     video.delete()
     messages.info(request, 'Видеозапись удалена.')
     return redirect('video:my_videos')
+
+
+@login_required
+@require_POST
+def comment(request, video_id):
+    video = get_object_or_404(Video.objects.select_related('owner'), pk=video_id)
+    if not can_view(request.user, video.owner, video.owner.profile.privacy_video):
+        return redirect('video:view', video_id=video_id)
+    form = VideoCommentForm(request.POST)
+    if form.is_valid():
+        c = form.save(commit=False)
+        c.video = video
+        c.author = request.user
+        c.save()
+    return redirect('video:view', video_id=video_id)
