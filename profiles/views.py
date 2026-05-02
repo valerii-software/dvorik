@@ -70,6 +70,7 @@ def view_profile(request, user_id):
         'recent_photos': recent_photos,
         'photos_with_user': photos_with_user,
         'user_groups': user_groups,
+        'completion': profile.completion() if is_me else None,
         **flags,
     })
 

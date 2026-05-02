@@ -80,7 +80,19 @@ a:hover { text-decoration: underline; }
   letter-spacing: -0.5px;
   text-decoration: none;
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.15);
+  margin-right: 18px;
 }
+.topnav {
+  display: flex;
+  gap: 14px;
+}
+.topnav a {
+  color: #D6E2EC;
+  text-decoration: none;
+  font-size: 11px;
+}
+.topnav a:hover { color: #fff; text-decoration: none; }
+.topnav a.active { color: #fff; font-weight: bold; }
 .topbar .topbar-search {
   margin-left: auto;
 }
@@ -95,6 +107,40 @@ a:hover { text-decoration: underline; }
   margin-left: 14px;
 }
 .topbar .topbar-user a { color: #D6E2EC; }
+
+/* ===== Profile completion meter ===== */
+.completion {
+  margin: 8px 0 10px;
+  padding: 6px 8px;
+  background: #FFFCE5;
+  border: 1px solid #E6D77A;
+  width: 200px;
+}
+.completion-bar {
+  height: 8px;
+  background: #fff;
+  border: 1px solid #C7BC56;
+  position: relative;
+}
+.completion-fill {
+  height: 100%;
+  background: #6BB04A;
+}
+.completion-percent {
+  text-align: right;
+  font-size: 10px;
+  color: #777;
+  margin-top: 2px;
+}
+.completion-list {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  font-size: 10px;
+}
+.completion-list li {
+  margin: 2px 0;
+}
 
 /* ===== Layout ===== */
 .layout {

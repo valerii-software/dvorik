@@ -76,3 +76,29 @@ class Profile(models.Model):
         if self.avatar:
             return self.avatar.url
         return '/static/img/no_photo.png'
+
+    # Profile completion (own page only): list of (label, points, satisfied)
+    COMPLETION_ITEMS = (
+        ('Загрузить фотографию', 25, lambda p: bool(p.avatar)),
+        ('Указать дату рождения', 10, lambda p: bool(p.birth_date)),
+        ('Указать родной город', 10, lambda p: bool(p.home_city)),
+        ('Семейное положение',  5,  lambda p: bool(p.marital_status)),
+        ('Заполнить «о себе»',  10, lambda p: bool(p.about)),
+        ('Заполнить интересы',  10, lambda p: bool(p.interests)),
+        ('Любимая музыка',      5,  lambda p: bool(p.favourite_music)),
+        ('Любимые фильмы',      5,  lambda p: bool(p.favourite_movies)),
+        ('Любимые книги',       5,  lambda p: bool(p.favourite_books)),
+        ('Любимые цитаты',      5,  lambda p: bool(p.favourite_quotes)),
+        ('Добавить контакты',   10, lambda p: bool(p.skype or p.icq or p.site)),
+    )
+
+    def completion(self):
+        """Returns dict {percent, missing: [(label, points), ...]}."""
+        percent = 0
+        missing = []
+        for label, points, check in self.COMPLETION_ITEMS:
+            if check(self):
+                percent += points
+            else:
+                missing.append((label, points))
+        return {'percent': percent, 'missing': missing}

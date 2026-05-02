@@ -12,14 +12,16 @@
 <div class="topbar">
   <div class="topbar-inner">
     <a class="logo" href="{% url 'profiles:my_page' %}">ВКонтакте</a>
+    <nav class="topnav">
+      <a href="{% url 'profiles:my_page' %}" class="{% if section == 'profile' %}active{% endif %}">главная</a>
+      <a href="{% url 'feed:news' %}" class="{% if section == 'news' %}active{% endif %}">новости</a>
+      <a href="{% url 'friends:search' %}" class="{% if section == 'search' %}active{% endif %}">поиск</a>
+      <a href="{% url 'groups:all_groups' %}" class="{% if section == 'all_groups' or section == 'my_groups' %}active{% endif %}">группы</a>
+      <a href="{% url 'accounts:logout' %}">выйти</a>
+    </nav>
     <form class="topbar-search" method="get" action="{% url 'friends:search' %}">
-      <input type="text" name="q" value="{{ request.GET.q|default:'' }}" placeholder="Поиск людей">
+      <input type="text" name="q" value="{{ request.GET.q|default:'' }}" placeholder="Поиск">
     </form>
-    <span class="topbar-user">
-      <a href="{% url 'profiles:my_page' %}">{{ user.first_name }}</a>
-      &nbsp;|&nbsp;
-      <a href="{% url 'accounts:logout' %}">выход</a>
-    </span>
   </div>
 </div>
 
