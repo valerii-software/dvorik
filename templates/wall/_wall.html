@@ -20,6 +20,8 @@
        hx-get="{{ graffiti_url }}"
        hx-target="#modal-content"
        hx-swap="innerHTML"
+       hx-select="*"
+       hx-disinherit="hx-select hx-target hx-swap"
        data-modal-open>Оставить граффити</a>
   </div>
 </div>
