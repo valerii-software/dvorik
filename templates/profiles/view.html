@@ -49,24 +49,53 @@
   </div>
 
   <div class="profile-info">
-    <table>
+    {% if profile.education %}
+      <div class="profile-edu">{{ profile.education }}</div>
+    {% endif %}
+
+    <table class="profile-facts">
       {% if profile.gender %}<tr><td class="label">Пол:</td><td>{{ profile.get_gender_display }}</td></tr>{% endif %}
+      {% if profile.marital_status %}<tr><td class="label">Семейное положение:</td><td>{{ profile.get_marital_status_display }}</td></tr>{% endif %}
       {% if profile.birth_date %}<tr><td class="label">День рождения:</td><td>{{ profile.birth_date|date:"j E Y" }}</td></tr>{% endif %}
-      {% if profile.marital_status %}<tr><td class="label">Сем. положение:</td><td>{{ profile.get_marital_status_display }}</td></tr>{% endif %}
       {% if profile.home_city %}<tr><td class="label">Родной город:</td><td>{{ profile.home_city }}</td></tr>{% endif %}
+      {% if profile.political_views %}<tr><td class="label">Полит. взгляды:</td><td>{{ profile.get_political_views_display }}</td></tr>{% endif %}
+      {% if profile.religious_views %}<tr><td class="label">Религ. взгляды:</td><td>{{ profile.religious_views }}</td></tr>{% endif %}
       {% if profile.languages %}<tr><td class="label">Языки:</td><td>{{ profile.languages }}</td></tr>{% endif %}
-      {% if profile.activity %}<tr><td class="label">Деятельность:</td><td>{{ profile.activity }}</td></tr>{% endif %}
-      {% if profile.skype %}<tr><td class="label">Skype:</td><td>{{ profile.skype }}</td></tr>{% endif %}
-      {% if profile.icq %}<tr><td class="label">ICQ:</td><td>{{ profile.icq }}</td></tr>{% endif %}
-      {% if profile.site %}<tr><td class="label">Сайт:</td><td>{{ profile.site }}</td></tr>{% endif %}
     </table>
 
-    {% if profile.about %}<h2>О себе</h2><div>{{ profile.about|linebreaksbr }}</div>{% endif %}
-    {% if profile.interests %}<h2>Интересы</h2><div>{{ profile.interests|linebreaksbr }}</div>{% endif %}
-    {% if profile.favourite_music %}<h2>Любимая музыка</h2><div>{{ profile.favourite_music|linebreaksbr }}</div>{% endif %}
-    {% if profile.favourite_movies %}<h2>Любимые фильмы</h2><div>{{ profile.favourite_movies|linebreaksbr }}</div>{% endif %}
-    {% if profile.favourite_books %}<h2>Любимые книги</h2><div>{{ profile.favourite_books|linebreaksbr }}</div>{% endif %}
-    {% if profile.favourite_quotes %}<h2>Любимые цитаты</h2><div>{{ profile.favourite_quotes|linebreaksbr }}</div>{% endif %}
+    {% if profile.mobile_phone or profile.skype or profile.icq or profile.site or profile.activity or profile.interests or profile.favourite_music or profile.favourite_movies or profile.favourite_tv or profile.favourite_games or profile.favourite_books or profile.favourite_quotes or profile.about %}
+      <div class="info-section">
+        <div class="info-section-header">
+          <span class="caret">▶</span> Информация
+          {% if is_me %}<a class="edit-link" href="{% url 'profiles:edit' %}">редактировать</a>{% endif %}
+        </div>
+
+        {% if profile.mobile_phone or profile.skype or profile.icq or profile.site %}
+          <h3>Контактная информация</h3>
+          <table class="profile-facts">
+            {% if profile.site %}<tr><td class="label">Веб-сайт:</td><td>{{ profile.site }}</td></tr>{% endif %}
+            {% if profile.mobile_phone %}<tr><td class="label">Мобильный телефон:</td><td>{{ profile.mobile_phone }}</td></tr>{% endif %}
+            {% if profile.skype %}<tr><td class="label">Skype:</td><td>{{ profile.skype }}</td></tr>{% endif %}
+            {% if profile.icq %}<tr><td class="label">ICQ:</td><td>{{ profile.icq }}</td></tr>{% endif %}
+          </table>
+        {% endif %}
+
+        {% if profile.activity or profile.interests or profile.favourite_music or profile.favourite_movies or profile.favourite_tv or profile.favourite_games or profile.favourite_books or profile.favourite_quotes or profile.about %}
+          <h3>Личная информация</h3>
+          <table class="profile-facts">
+            {% if profile.activity %}<tr><td class="label">Деятельность:</td><td>{{ profile.activity }}</td></tr>{% endif %}
+            {% if profile.interests %}<tr><td class="label">Интересы:</td><td>{{ profile.interests|linebreaksbr }}</td></tr>{% endif %}
+            {% if profile.favourite_music %}<tr><td class="label">Любимая музыка:</td><td>{{ profile.favourite_music|linebreaksbr }}</td></tr>{% endif %}
+            {% if profile.favourite_movies %}<tr><td class="label">Любимые фильмы:</td><td>{{ profile.favourite_movies|linebreaksbr }}</td></tr>{% endif %}
+            {% if profile.favourite_tv %}<tr><td class="label">Любимые телешоу:</td><td>{{ profile.favourite_tv|linebreaksbr }}</td></tr>{% endif %}
+            {% if profile.favourite_games %}<tr><td class="label">Любимые игры:</td><td>{{ profile.favourite_games|linebreaksbr }}</td></tr>{% endif %}
+            {% if profile.favourite_books %}<tr><td class="label">Любимые книги:</td><td>{{ profile.favourite_books|linebreaksbr }}</td></tr>{% endif %}
+            {% if profile.favourite_quotes %}<tr><td class="label">Любимые цитаты:</td><td>{{ profile.favourite_quotes|linebreaksbr }}</td></tr>{% endif %}
+            {% if profile.about %}<tr><td class="label">О себе:</td><td>{{ profile.about|linebreaksbr }}</td></tr>{% endif %}
+          </table>
+        {% endif %}
+      </div>
+    {% endif %}
   </div>
 </div>
 

@@ -253,10 +253,50 @@ textarea { resize: vertical; }
   border: 1px solid #ABB6C2;
   display: block;
 }
-.profile-info { flex: 1; }
-.profile-info table { border-collapse: collapse; width: 100%; }
-.profile-info td { padding: 2px 6px 2px 0; vertical-align: top; }
-.profile-info td.label { color: #777; width: 130px; }
+.profile-info { flex: 1; min-width: 0; position: relative; }
+.profile-info table.profile-facts { border-collapse: collapse; width: 100%; }
+.profile-info table.profile-facts td { padding: 2px 6px 2px 0; vertical-align: top; }
+.profile-info table.profile-facts td.label { color: #777; width: 150px; }
+
+.profile-edu {
+  position: absolute;
+  top: 0;
+  right: 0;
+  color: #777;
+  font-size: 11px;
+}
+
+.info-section {
+  margin-top: 12px;
+}
+.info-section-header {
+  background: #DCE2E8;
+  border-top: 1px solid #B6C3D2;
+  border-bottom: 1px solid #B6C3D2;
+  padding: 4px 8px;
+  font-weight: bold;
+  color: #2B587A;
+  position: relative;
+}
+.info-section-header .caret {
+  display: inline-block;
+  margin-right: 4px;
+  color: #45668E;
+  font-size: 9px;
+}
+.info-section-header .edit-link {
+  position: absolute;
+  right: 8px;
+  top: 4px;
+  font-weight: normal;
+  font-size: 11px;
+}
+.info-section h3 {
+  font-size: 12px;
+  font-weight: bold;
+  color: #2B587A;
+  margin: 10px 0 4px;
+}
 
 .profile-actions { margin-top: 6px; }
 .profile-actions a { display: block; margin-bottom: 3px; }

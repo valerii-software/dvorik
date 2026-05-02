@@ -20,19 +20,26 @@ class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = (
-            'avatar', 'gender', 'birth_date', 'marital_status', 'home_city', 'languages',
-            'activity', 'interests', 'favourite_music', 'favourite_movies',
-            'favourite_books', 'favourite_quotes', 'about',
-            'skype', 'icq', 'site',
+            'avatar',
+            'gender', 'birth_date', 'marital_status',
+            'home_city', 'languages', 'education',
+            'political_views', 'religious_views',
+            'mobile_phone', 'skype', 'icq', 'site',
+            'activity', 'interests',
+            'favourite_music', 'favourite_movies', 'favourite_tv',
+            'favourite_games', 'favourite_books', 'favourite_quotes',
+            'about',
         )
         widgets = {
             'birth_date': forms.DateInput(attrs={'type': 'date'}),
-            'interests': forms.Textarea(attrs={'rows': 2, 'cols': 50}),
-            'favourite_music': forms.Textarea(attrs={'rows': 2, 'cols': 50}),
+            'interests':        forms.Textarea(attrs={'rows': 2, 'cols': 50}),
+            'favourite_music':  forms.Textarea(attrs={'rows': 2, 'cols': 50}),
             'favourite_movies': forms.Textarea(attrs={'rows': 2, 'cols': 50}),
-            'favourite_books': forms.Textarea(attrs={'rows': 2, 'cols': 50}),
+            'favourite_tv':     forms.Textarea(attrs={'rows': 2, 'cols': 50}),
+            'favourite_games':  forms.Textarea(attrs={'rows': 2, 'cols': 50}),
+            'favourite_books':  forms.Textarea(attrs={'rows': 2, 'cols': 50}),
             'favourite_quotes': forms.Textarea(attrs={'rows': 2, 'cols': 50}),
-            'about': forms.Textarea(attrs={'rows': 3, 'cols': 50}),
+            'about':            forms.Textarea(attrs={'rows': 3, 'cols': 50}),
         }
 
     def __init__(self, *args, **kwargs):

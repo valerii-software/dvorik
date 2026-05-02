@@ -21,6 +21,18 @@ class Profile(models.Model):
         ('searching', 'в активном поиске'),
         ('love', 'влюблён(а)'),
     ]
+    POLITICAL = [
+        ('', 'не указаны'),
+        ('indifferent', 'безразличные'),
+        ('communist', 'коммунистические'),
+        ('socialist', 'социалистические'),
+        ('moderate', 'умеренные'),
+        ('liberal', 'либеральные'),
+        ('conservative', 'консервативные'),
+        ('monarchist', 'монархические'),
+        ('ultraconservative', 'ультраконсервативные'),
+        ('libertarian', 'либертарианские'),
+    ]
 
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
@@ -33,18 +45,26 @@ class Profile(models.Model):
     marital_status = models.CharField('сем. положение', max_length=20, choices=MARITAL, blank=True, default='')
     home_city = models.CharField('родной город', max_length=120, blank=True)
     languages = models.CharField('языки', max_length=200, blank=True)
+    political_views = models.CharField('полит. взгляды', max_length=20,
+                                       choices=POLITICAL, blank=True, default='')
+    religious_views = models.CharField('религ. взгляды', max_length=80, blank=True)
+    education = models.CharField('образование', max_length=120, blank=True,
+                                 help_text='например: «СПбГУ ’06»')
 
     activity = models.CharField('деятельность', max_length=200, blank=True)
     interests = models.TextField('интересы', blank=True)
     favourite_music = models.TextField('любимая музыка', blank=True)
     favourite_movies = models.TextField('любимые фильмы', blank=True)
+    favourite_tv = models.TextField('любимые телешоу', blank=True)
+    favourite_games = models.TextField('любимые игры', blank=True)
     favourite_books = models.TextField('любимые книги', blank=True)
     favourite_quotes = models.TextField('любимые цитаты', blank=True)
     about = models.TextField('о себе', blank=True)
 
+    mobile_phone = models.CharField('мобильный телефон', max_length=40, blank=True)
     skype = models.CharField('Skype', max_length=80, blank=True)
     icq = models.CharField('ICQ', max_length=20, blank=True)
-    site = models.CharField('сайт', max_length=200, blank=True)
+    site = models.CharField('веб-сайт', max_length=200, blank=True)
 
     privacy_profile = models.CharField('кто видит мою страницу', max_length=10,
                                        choices=PRIVACY_CHOICES, default='all')
@@ -79,17 +99,18 @@ class Profile(models.Model):
 
     # Profile completion (own page only): list of (label, points, satisfied)
     COMPLETION_ITEMS = (
-        ('Загрузить фотографию', 25, lambda p: bool(p.avatar)),
+        ('Загрузить фотографию', 20, lambda p: bool(p.avatar)),
         ('Указать дату рождения', 10, lambda p: bool(p.birth_date)),
         ('Указать родной город', 10, lambda p: bool(p.home_city)),
+        ('Указать образование',  5,  lambda p: bool(p.education)),
         ('Семейное положение',  5,  lambda p: bool(p.marital_status)),
+        ('Полит. взгляды',      5,  lambda p: bool(p.political_views)),
         ('Заполнить «о себе»',  10, lambda p: bool(p.about)),
         ('Заполнить интересы',  10, lambda p: bool(p.interests)),
         ('Любимая музыка',      5,  lambda p: bool(p.favourite_music)),
         ('Любимые фильмы',      5,  lambda p: bool(p.favourite_movies)),
         ('Любимые книги',       5,  lambda p: bool(p.favourite_books)),
-        ('Любимые цитаты',      5,  lambda p: bool(p.favourite_quotes)),
-        ('Добавить контакты',   10, lambda p: bool(p.skype or p.icq or p.site)),
+        ('Добавить контакты',   10, lambda p: bool(p.skype or p.icq or p.site or p.mobile_phone)),
     )
 
     def completion(self):
