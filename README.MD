@@ -4,6 +4,8 @@
 Вдохновлено «эпохой стены» (до октября 2010), сделано не как клон, а как
 самостоятельный проект с собственным брендом.
 
+🔗 <https://github.com/valerii-software/dvorik>
+
 **Стек:** Django 5 · Templates · HTMX · PostgreSQL (или SQLite для локалки) ·
 Pillow · gunicorn · nginx.
 
@@ -26,6 +28,8 @@ Pillow · gunicorn · nginx.
 ## Локальная разработка
 
 ```bash
+git clone https://github.com/valerii-software/dvorik.git
+cd dvorik
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 .venv/bin/python manage.py migrate
