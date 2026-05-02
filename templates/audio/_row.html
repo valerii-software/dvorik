@@ -1,8 +1,10 @@
-<div class="audio-row">
+<div class="audio-row" data-src="{{ track.file.url }}">
+  <button type="button" class="audio-play" aria-label="Воспроизвести">▶</button>
   <div class="audio-meta">
-    <b>{{ track.artist }}</b> — {{ track.title }}
+    <div class="audio-title"><b>{{ track.artist }}</b> — {{ track.title }}</div>
+    <div class="audio-progress"><div class="audio-progress-fill"></div></div>
   </div>
-  <audio controls preload="none" src="{{ track.file.url }}"></audio>
+  <span class="audio-time">0:00</span>
   <div class="audio-actions">
     {% if show_remove %}
       <form method="post" action="{% url 'audio:remove' track.id %}" style="display:inline">

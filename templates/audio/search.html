@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Поиск аудиозаписей — ВКонтакте{% endblock %}
 
 {% block content %}
@@ -22,4 +23,5 @@
     <div class="empty">Ничего не найдено.</div>
   {% endif %}
 {% endif %}
+<script src="{% static 'js/audio_player.js' %}"></script>
 {% endblock %}
