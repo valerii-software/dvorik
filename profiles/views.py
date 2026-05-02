@@ -18,7 +18,7 @@ User = get_user_model()
 
 @login_required
 def my_page(request):
-    return view_profile(request, request.user.id)
+    return redirect('profiles:view', user_id=request.user.id)
 
 
 @login_required
