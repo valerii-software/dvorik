@@ -10,6 +10,7 @@
 <form method="post" action="{% url 'messaging:send' dialog.id %}"
       hx-post="{% url 'messaging:send' dialog.id %}"
       hx-target="#messages" hx-swap="outerHTML"
+      hx-disinherit="hx-select hx-target hx-swap"
       hx-on::after-request="this.reset()"
       style="margin-top:10px">
   {% csrf_token %}
