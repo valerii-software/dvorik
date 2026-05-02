@@ -326,6 +326,9 @@ textarea { resize: vertical; }
 .profile-photo {
   width: 200px;
   flex-shrink: 0;
+  min-width: 0;
+  overflow: hidden;
+  word-break: break-word;
 }
 .profile-photo img {
   width: 200px;
@@ -376,6 +379,8 @@ textarea { resize: vertical; }
   margin-top: 2px;
   font-size: 10px;
   line-height: 1.1;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .mini-photo-grid {
