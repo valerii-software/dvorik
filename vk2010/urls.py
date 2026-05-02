@@ -22,3 +22,7 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+handler404 = 'vk2010.views.handler404'
+handler500 = 'vk2010.views.handler500'
+handler403 = 'vk2010.views.handler403'

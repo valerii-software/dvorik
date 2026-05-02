@@ -33,6 +33,7 @@ a:hover { text-decoration: underline; }
   font-weight: bold;
   letter-spacing: -0.5px;
   text-decoration: none;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.15);
 }
 .topbar .topbar-search {
   margin-left: auto;
@@ -71,7 +72,7 @@ a:hover { text-decoration: underline; }
 }
 .sidebar li a {
   display: block;
-  padding: 4px 10px 4px 14px;
+  padding: 3px 10px 3px 14px;
   color: #2B587A;
 }
 .sidebar li a.active,
@@ -396,6 +397,23 @@ textarea { resize: vertical; }
   padding: 18px 22px;
 }
 .auth-card h1 { font-size: 13px; }
+.auth-card p { margin: 6px 0; }
+.auth-hint {
+  width: 380px;
+  margin: 10px auto 60px;
+  text-align: center;
+  color: #777;
+  font-size: 10px;
+}
+
+/* ===== Error pages ===== */
+.error-card {
+  background: #FFFCE5;
+  border: 1px solid #E6D77A;
+  padding: 14px 18px;
+  margin-top: 8px;
+}
+.error-card p { margin: 6px 0; }
 
 /* ===== Misc ===== */
 .empty {

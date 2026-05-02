@@ -2,7 +2,8 @@
 {% block title %}Регистрация — ВКонтакте{% endblock %}
 {% block anon_content %}
 <div class="auth-card">
-  <h1>Регистрация</h1>
+  <h1>Регистрация на сайте</h1>
+  <p class="muted">Заполните анкету — это займёт пару минут.</p>
   <form method="post">
     {% csrf_token %}
     {% for field in form %}

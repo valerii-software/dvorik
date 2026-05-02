@@ -2,7 +2,7 @@
 {% block title %}Вход — ВКонтакте{% endblock %}
 {% block anon_content %}
 <div class="auth-card">
-  <h1>Вход</h1>
+  <h1>Вход на сайт</h1>
   {% if error %}<div class="form-error">{{ error }}</div>{% endif %}
   <form method="post">
     {% csrf_token %}
@@ -20,5 +20,8 @@
       &nbsp;<a href="{% url 'accounts:register' %}">Регистрация</a>
     </div>
   </form>
+</div>
+<div class="auth-hint">
+  Регистрируясь, вы соглашаетесь не делиться странички с друзьями за пределами сайта.
 </div>
 {% endblock %}

@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Страница не найдена — ВКонтакте{% endblock %}
+
+{% block content %}
+<h1>Страница не найдена</h1>
+<div class="error-card">
+  <p>Запрошенная вами страница не существует или была удалена.</p>
+  <p>Проверьте, правильно ли набран адрес. Возможно, ссылка устарела.</p>
+  <p><a href="{% url 'profiles:my_page' %}">← Вернуться на свою страницу</a></p>
+</div>
+{% endblock %}
+
+{% block anon_content %}
+<div class="auth-card">
+  <h1>Страница не найдена</h1>
+  <p>Запрошенная страница не существует.</p>
+  <p><a href="{% url 'accounts:login' %}">Войти</a></p>
+</div>
+{% endblock %}
