@@ -31,6 +31,8 @@ INSTALLED_APPS = [
     'photos',
     'audio',
     'video',
+    'groups',
+    'feed',
 ]
 
 MIDDLEWARE = [

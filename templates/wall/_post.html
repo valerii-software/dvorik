@@ -8,7 +8,7 @@
     <div class="text">{{ p.text|linebreaksbr }}</div>
     <div class="meta">
       {{ p.created_at|date:"j E Y, H:i" }}
-      {% if p.author_id == request.user.id or p.owner_id == request.user.id %}
+      {% if p.author_id == request.user.id or p.owner_id == request.user.id or p.group and p.group.owner_id == request.user.id %}
         &nbsp;·&nbsp;
         <form method="post" action="{% url 'wall:delete' p.id %}" style="display:inline">
           {% csrf_token %}

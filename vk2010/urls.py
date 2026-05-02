@@ -16,6 +16,8 @@ urlpatterns = [
     path('photos/', include('photos.urls')),
     path('audio/', include('audio.urls')),
     path('video/', include('video.urls')),
+    path('groups/', include('groups.urls')),
+    path('feed/', include('feed.urls')),
 ]
 
 if settings.DEBUG:

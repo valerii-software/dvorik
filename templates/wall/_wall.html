@@ -1,6 +1,11 @@
+{% if group %}
+  {% url 'wall:post_to_group' group.id as post_url %}
+{% else %}
+  {% url 'wall:post' owner.id as post_url %}
+{% endif %}
 <div class="wall-form">
-  <form method="post" action="{% url 'wall:post' owner.id %}"
-        hx-post="{% url 'wall:post' owner.id %}"
+  <form method="post" action="{{ post_url }}"
+        hx-post="{{ post_url }}"
         hx-target="#wall-posts" hx-swap="outerHTML">
     {% csrf_token %}
     {{ wall_form.text }}
@@ -8,4 +13,4 @@
   </form>
 </div>
 
-{% include 'wall/_posts.html' with posts=posts owner=owner %}
+{% include 'wall/_posts.html' with posts=posts owner=owner group=group %}

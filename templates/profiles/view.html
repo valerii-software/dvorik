@@ -90,6 +90,19 @@
   </div>
 {% endif %}
 
+{% if user_groups %}
+  <h2>Группы</h2>
+  <div class="friend-grid">
+    {% for g in user_groups %}
+      <div class="friend-card">
+        <a href="{% url 'groups:view' g.id %}"><img src="{{ g.avatar_url }}" alt=""></a>
+        <a class="name" href="{% url 'groups:view' g.id %}">{{ g.name }}</a>
+      </div>
+    {% endfor %}
+  </div>
+  <div style="margin-top:6px"><a href="{% url 'groups:user_groups' pageuser.id %}">Все группы →</a></div>
+{% endif %}
+
 <h2>Стена</h2>
 {% include 'wall/_wall.html' with posts=posts owner=pageuser wall_form=wall_form %}
 

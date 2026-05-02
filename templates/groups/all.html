@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Поиск групп — ВКонтакте{% endblock %}
+
+{% block content %}
+<h1>Поиск групп</h1>
+
+<form method="get" style="margin-bottom:14px">
+  <div class="form-row">
+    <label>Название или описание</label>
+    <input type="text" name="q" value="{{ q }}" autofocus>
+    <button class="btn btn-primary" type="submit">Искать</button>
+    &nbsp;<a href="{% url 'groups:create_group' %}">Создать группу</a>
+  </div>
+</form>
+
+{% if groups %}
+  <div class="album-grid">
+    {% for g in groups %}
+      <div class="album-card">
+        <a href="{% url 'groups:view' g.id %}"><img src="{{ g.avatar_url }}" alt=""></a>
+        <a class="title" href="{% url 'groups:view' g.id %}">{{ g.name }}</a>
+        <div class="muted">{{ g.members_count }} участников</div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty">{% if q %}Ничего не найдено.{% else %}Групп пока нет.{% endif %}</div>
+{% endif %}
+{% endblock %}

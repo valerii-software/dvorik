@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}{% if is_me %}Мои группы{% else %}Группы — {{ pageuser.get_full_name }}{% endif %}{% endblock %}
+
+{% block content %}
+<h1>
+  {% if is_me %}Мои группы
+  {% else %}Группы пользователя <a href="{% url 'profiles:view' pageuser.id %}">{{ pageuser.get_full_name }}</a>
+  {% endif %}
+  ({{ groups|length }})
+</h1>
+
+{% if is_me %}
+  <div style="margin-bottom:10px">
+    <a class="btn btn-primary" href="{% url 'groups:create_group' %}">Создать группу</a>
+    &nbsp;<a class="btn" href="{% url 'groups:all_groups' %}">Поиск групп</a>
+  </div>
+{% endif %}
+
+{% if groups %}
+  <div class="album-grid">
+    {% for g in groups %}
+      <div class="album-card">
+        <a href="{% url 'groups:view' g.id %}"><img src="{{ g.avatar_url }}" alt=""></a>
+        <a class="title" href="{% url 'groups:view' g.id %}">{{ g.name }}</a>
+        <div class="muted">{{ g.members_count }} участников</div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty">Групп пока нет.</div>
+{% endif %}
+{% endblock %}

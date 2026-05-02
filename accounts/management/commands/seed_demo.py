@@ -8,6 +8,7 @@ from django.core.management.base import BaseCommand
 from PIL import Image, ImageDraw
 
 from friends.models import Friendship
+from groups.models import Group, GroupMember
 from messaging.models import Dialog, Message
 from photos.models import Album, Photo, PhotoTag
 from wall.models import WallPost
@@ -86,6 +87,34 @@ class Command(BaseCommand):
             Message.objects.create(dialog=d, sender=users[1], text='Привет, Паша!')
             Message.objects.create(dialog=d, sender=pavel, text='Привет, Анна! Как ты?')
             Message.objects.create(dialog=d, sender=users[1], text='Отлично, спасибо! :)')
+
+        # groups
+        if not Group.objects.exists():
+            club = Group.objects.create(
+                owner=pavel, name='Клуб любителей пельменей',
+                description='Здесь обсуждаем сорта пельменей, рецепты и места.',
+            )
+            for u in [pavel, users[1], users[2], users[4]]:
+                GroupMember.objects.get_or_create(group=club, user=u)
+            WallPost.objects.create(
+                group=club, author=pavel,
+                text='Всем привет! Записывайтесь и делитесь рецептами.',
+            )
+            WallPost.objects.create(
+                group=club, author=users[2],
+                text='Сегодня сделал пельмени с грибами — рекомендую!',
+            )
+
+            second = Group.objects.create(
+                owner=users[1], name='МГУ — журфак',
+                description='Сообщество студентов и выпускников.',
+            )
+            for u in [users[1], users[3]]:
+                GroupMember.objects.get_or_create(group=second, user=u)
+            WallPost.objects.create(
+                group=second, author=users[1],
+                text='Кто пойдёт на лекцию в субботу?',
+            )
 
         # photo albums
         if not Album.objects.exists():

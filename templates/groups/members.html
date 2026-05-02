@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Участники — {{ group.name }}{% endblock %}
+
+{% block content %}
+<div class="muted" style="margin-bottom:4px">
+  <a href="{% url 'groups:view' group.id %}">{{ group.name }}</a>
+</div>
+<h1>Участники ({{ group.members_count }})</h1>
+
+{% for m in members %}
+  <div class="friend-row">
+    <a href="{% url 'profiles:view' m.user.id %}"><img class="ava" src="{{ m.user.profile.avatar_url }}"></a>
+    <div class="body">
+      <a href="{% url 'profiles:view' m.user.id %}"><b>{{ m.user.get_full_name|default:m.user.email }}</b></a>
+      {% if m.user_id == group.owner_id %}<span class="muted">— создатель</span>{% endif %}
+      {% if m.user.profile.home_city %}<div class="muted">{{ m.user.profile.home_city }}</div>{% endif %}
+    </div>
+  </div>
+{% endfor %}
+{% endblock %}

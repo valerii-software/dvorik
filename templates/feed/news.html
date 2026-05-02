@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Мои новости — ВКонтакте{% endblock %}
+
+{% block content %}
+<h1>Мои новости</h1>
+
+{% if posts %}
+  <div id="wall-posts">
+    {% for p in posts %}
+      <div class="feed-target muted">
+        {% if p.group_id %}
+          в группе <a href="{% url 'groups:view' p.group.id %}">{{ p.group.name }}</a>
+        {% else %}
+          на стене <a href="{% url 'profiles:view' p.owner.id %}">{{ p.owner.get_full_name }}</a>
+        {% endif %}
+      </div>
+      {% include 'wall/_post.html' with p=p %}
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty">В ленте пока ничего нет. Добавьте друзей или вступите в группы.</div>
+{% endif %}
+{% endblock %}
