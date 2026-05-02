@@ -1,11 +1,27 @@
 {% extends 'base.html' %}
-{% block title %}Переписка с {{ other.get_full_name }} — Дворик{% endblock %}
+{% block title %}{{ title }} — Дворик{% endblock %}
 
 {% block content %}
-<h1>Переписка с <a href="{% url 'profiles:view' other.id %}">{{ other.get_full_name }}</a></h1>
-<div style="margin-bottom:8px"><a href="{% url 'messaging:inbox' %}">← Все диалоги</a></div>
+{% if is_group %}
+  <h1>{{ title }} <span class="muted" style="font-size:11px; font-weight:normal">[чат · {{ members|length }} участников]</span></h1>
+  <div class="muted" style="margin-bottom:8px">
+    <a href="{% url 'messaging:inbox' %}">← Все диалоги</a>
+    {% for m in members %}
+      <a href="{% url 'profiles:view' m.id %}">{{ m.first_name }} {{ m.last_name }}</a>{% if not forloop.last %}, {% endif %}
+    {% endfor %}
+    {% if dialog.created_by_id == request.user.id or request.user in members %}
+      ·
+      <form method="post" action="{% url 'messaging:leave_chat' dialog.id %}" style="display:inline" onsubmit="return confirm('Покинуть чат?')">
+        {% csrf_token %}<button class="link-btn" type="submit">покинуть</button>
+      </form>
+    {% endif %}
+  </div>
+{% else %}
+  <h1>Переписка с <a href="{% url 'profiles:view' other.id %}">{{ other.get_full_name }}</a></h1>
+  <div style="margin-bottom:8px"><a href="{% url 'messaging:inbox' %}">← Все диалоги</a></div>
+{% endif %}
 
-{% include 'messaging/_messages.html' with messages_list=messages_list dialog=dialog other=other %}
+{% include 'messaging/_messages.html' with messages_list=messages_list dialog=dialog %}
 
 <form method="post" action="{% url 'messaging:send' dialog.id %}" enctype="multipart/form-data"
       hx-post="{% url 'messaging:send' dialog.id %}"

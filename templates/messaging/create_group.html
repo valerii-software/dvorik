@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}Создать чат — Дворик{% endblock %}
+
+{% block content %}
+<h1>Создать групповой чат</h1>
+
+<form method="post">
+  {% csrf_token %}
+  <div class="form-row">
+    <label>Название</label>
+    <input type="text" name="name" maxlength="120" required autofocus>
+  </div>
+  <div class="form-row" style="align-items:flex-start">
+    <label>Участники</label>
+    <div>
+      {% if friends %}
+        {% for f in friends %}
+          <label style="display:block; margin:2px 0">
+            <input type="checkbox" name="members" value="{{ f.id }}">
+            {{ f.get_full_name }}
+          </label>
+        {% endfor %}
+      {% else %}
+        <div class="muted">У вас пока нет друзей. Сначала добавьте кого-нибудь в друзья.</div>
+      {% endif %}
+    </div>
+  </div>
+  <div class="form-row">
+    <label></label>
+    <button class="btn btn-primary" type="submit"{% if not friends %} disabled{% endif %}>Создать чат</button>
+    &nbsp;<a href="{% url 'messaging:inbox' %}">Отмена</a>
+  </div>
+</form>
+{% endblock %}
