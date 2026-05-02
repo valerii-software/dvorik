@@ -20,12 +20,7 @@
       <a href="{% url 'groups:all_groups' %}" class="{% if section == 'all_groups' or section == 'my_groups' %}active{% endif %}">группы</a>
       <a href="{% url 'accounts:logout' %}">выйти</a>
     </nav>
-    <form class="topbar-search" method="get" action="{% url 'friends:search' %}">
-      <input type="text" name="q" value="{{ request.GET.q|default:'' }}" placeholder="Поиск">
-    </form>
-  </div>
-  <div class="topbar-player" id="topbar-player" hidden>
-    <div class="topbar-player-inner">
+    <div class="topbar-player" id="topbar-player" hidden>
       <button type="button" class="player-toggle" id="player-toggle">❚❚</button>
       <div class="player-meta">
         <div class="player-title" id="player-title"></div>
@@ -34,6 +29,9 @@
       <span class="player-time" id="player-time">0:00</span>
       <button type="button" class="player-close" id="player-close" title="Закрыть">×</button>
     </div>
+    <form class="topbar-search" method="get" action="{% url 'friends:search' %}">
+      <input type="text" name="q" value="{{ request.GET.q|default:'' }}" placeholder="Поиск">
+    </form>
   </div>
 </div>
 

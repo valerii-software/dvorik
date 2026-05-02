@@ -103,33 +103,28 @@ a:hover { text-decoration: underline; }
 }
 .topbar .topbar-user a { color: #D6E2EC; }
 
-/* Header audio player */
-.topbar { padding-bottom: 0; }
+/* Inline header audio player (between nav and search) */
 .topbar-player {
-  background: #2B587A;
-  border-top: 1px solid #1F4665;
-  border-bottom: 1px solid #1F4665;
-}
-.topbar-player-inner {
-  width: 800px;
-  margin: 0 auto;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 4px 0;
+  gap: 6px;
+  margin-left: 14px;
+  max-width: 240px;
 }
+.topbar-player[hidden] { display: none; }
 .topbar-player .player-toggle {
-  width: 20px;
-  height: 20px;
-  background: linear-gradient(to bottom, #6E8DB0, #45668E);
+  width: 16px;
+  height: 16px;
+  background: linear-gradient(to bottom, #6E8DB0, #2B587A);
   border: 1px solid #1F4665;
   color: #fff;
-  font-size: 9px;
+  font-size: 8px;
+  line-height: 1;
   cursor: pointer;
   padding: 0;
   flex-shrink: 0;
 }
-.topbar-player .player-toggle:hover { background: #45668E; }
+.topbar-player .player-toggle:hover { background: #2B587A; }
 .topbar-player .player-meta {
   flex: 1;
   min-width: 0;
@@ -137,15 +132,16 @@ a:hover { text-decoration: underline; }
 .topbar-player .player-title {
   color: #fff;
   font-size: 11px;
+  line-height: 1.1;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .topbar-player .player-title b { color: #D6E2EC; }
 .topbar-player .player-progress {
-  height: 3px;
+  height: 2px;
   background: #1F4665;
-  margin-top: 3px;
+  margin-top: 2px;
   cursor: pointer;
 }
 .topbar-player .player-progress-fill {
@@ -156,20 +152,23 @@ a:hover { text-decoration: underline; }
 .topbar-player .player-time {
   color: #D6E2EC;
   font-size: 10px;
-  min-width: 78px;
-  text-align: right;
   font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
 }
 .topbar-player .player-close {
   background: none;
   border: 0;
   color: #D6E2EC;
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1;
   cursor: pointer;
-  padding: 0 4px;
+  padding: 0 2px;
+  flex-shrink: 0;
 }
 .topbar-player .player-close:hover { color: #fff; }
+
+/* When the player is visible, narrow the search a bit so all fits in 800px. */
+.topbar-player:not([hidden]) ~ .topbar-search input { width: 140px; }
 
 /* ===== Profile completion meter ===== */
 .completion {
