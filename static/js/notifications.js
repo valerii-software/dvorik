@@ -24,10 +24,16 @@
   document.addEventListener('click', unlock, { once: true, capture: true });
   document.addEventListener('keydown', unlock, { once: true, capture: true });
 
-  let lastCount = null;
+  let lastMessages = null;
 
   function syncTitle(n) {
     document.title = n > 0 ? '(' + n + ') ' + cfg.baseTitle : cfg.baseTitle;
+  }
+
+  function syncCounter(name, n) {
+    document.querySelectorAll('[data-counter="' + name + '"]').forEach(function (el) {
+      el.textContent = n > 0 ? ' (' + n + ')' : '';
+    });
   }
 
   function poll() {
@@ -36,14 +42,17 @@
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (data) {
         if (!data) return;
-        const n = data.count | 0;
-        if (lastCount !== null && n > lastCount) {
+        const messages = (data.messages != null ? data.messages : data.count) | 0;
+        const requests = (data.requests || 0) | 0;
+        if (lastMessages !== null && messages > lastMessages) {
           // count went up — play sound (best-effort, may be blocked
           // until first user gesture).
           try { audio.currentTime = 0; audio.play().catch(() => {}); } catch (e) {}
         }
-        lastCount = n;
-        syncTitle(n);
+        lastMessages = messages;
+        syncTitle(messages);
+        syncCounter('messages', messages);
+        syncCounter('requests', requests);
       })
       .catch(function () {});
   }

@@ -42,7 +42,10 @@ def _denied(request, other, message):
 
 @login_required
 def unread_count(request):
-    """Cheap JSON endpoint polled by the notification JS in base.html."""
+    """Cheap JSON endpoint polled by the notification JS in base.html.
+    Returns both new-message and pending-friend-request counters so the
+    sidebar badges can stay in sync without a page reload."""
+    from friends.models import Friendship
     n = (
         Message.objects
         .filter(dialog__participants=request.user, read=False)
@@ -50,7 +53,14 @@ def unread_count(request):
         .distinct()
         .count()
     )
-    return JsonResponse({'count': n})
+    pending = Friendship.objects.filter(
+        to_user=request.user, status=Friendship.PENDING,
+    ).count()
+    return JsonResponse({
+        'count': n,                 # backwards-compat alias for `messages`
+        'messages': n,
+        'requests': pending,
+    })
 
 
 @login_required
