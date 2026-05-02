@@ -23,6 +23,7 @@ class WallPost(models.Model):
         related_name='wall_posts_authored',
     )
     text = models.TextField(blank=True)
+    image = models.ImageField(upload_to='wall/%Y/%m/', blank=True, null=True)
     graffiti = models.ImageField(upload_to='graffiti/%Y/%m/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

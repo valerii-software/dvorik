@@ -724,6 +724,15 @@ canvas#graffiti {
   border: 1px solid #ABB6C2;
   display: block;
 }
+.wall-image {
+  margin: 4px 0;
+}
+.wall-image img {
+  max-width: 400px;
+  max-height: 400px;
+  border: 1px solid #ABB6C2;
+  display: block;
+}
 
 /* ===== Feed ===== */
 .feed-target {

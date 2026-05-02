@@ -8,6 +8,9 @@
     {% if p.graffiti %}
       <div class="graffiti-img"><img src="{{ p.graffiti.url }}" alt="граффити"></div>
     {% endif %}
+    {% if p.image %}
+      <div class="wall-image"><a href="{{ p.image.url }}" target="_blank"><img src="{{ p.image.url }}" alt=""></a></div>
+    {% endif %}
     {% if p.text %}<div class="text">{{ p.text|linebreaksbr }}</div>{% endif %}
     <div class="meta">
       {{ p.created_at|date:"j E Y, H:i" }}

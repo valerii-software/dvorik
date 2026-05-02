@@ -6,15 +6,22 @@
   {% url 'wall:graffiti_user' owner.id as graffiti_url %}
 {% endif %}
 <div class="wall-form">
-  <form method="post" action="{{ post_url }}"
+  <form method="post" action="{{ post_url }}" enctype="multipart/form-data"
         hx-post="{{ post_url }}"
         hx-target="#wall-posts" hx-swap="outerHTML"
-        hx-select="#wall-posts">
+        hx-select="#wall-posts"
+        hx-encoding="multipart/form-data">
     {% csrf_token %}
     {{ wall_form.text }}
-    <div style="margin-top:4px">
+    <div style="margin-top:4px; display:flex; align-items:center; gap:8px;">
       <button class="btn btn-primary" type="submit">Отправить</button>
+      <label class="muted" style="font-size:10px; cursor:pointer;">
+        📎 Прикрепить изображение
+        {{ wall_form.image }}
+      </label>
     </div>
+    {% if wall_form.image.errors %}<div class="err">{{ wall_form.image.errors|join:', ' }}</div>{% endif %}
+    {% if wall_form.non_field_errors %}<div class="err">{{ wall_form.non_field_errors|join:', ' }}</div>{% endif %}
   </form>
   <div style="margin-top:4px">
     <a href="{{ graffiti_url }}" hx-boost="false" data-modal-open>Оставить граффити</a>
