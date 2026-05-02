@@ -78,11 +78,13 @@
     <a class="logo" href="/">Дворик</a>
   </div>
 </div>
+<div id="page-body">
 {% block anon_content %}{% endblock %}
 <div class="footer">
   © 2006–2010 Дворик &nbsp;·&nbsp;
   <a href="{% url 'accounts:login' %}">Помощь</a> &nbsp;·&nbsp;
   Зарегистрировано пользователей: <b>{{ total_users }}</b>
+</div>
 </div>
 {% endif %}
 
