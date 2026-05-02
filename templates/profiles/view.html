@@ -21,7 +21,6 @@
         {% if friend_state == 'friends' %}
           <span class="muted">Вы друзья</span>
           {% include 'friends/_btn.html' with action='remove' label='удалить из друзей' uid=pageuser.id %}
-          {% if can_message %}<a href="{% url 'messaging:open' pageuser.id %}">написать сообщение</a>{% endif %}
         {% elif friend_state == 'sent' %}
           <span class="muted">Заявка отправлена</span>
           {% include 'friends/_btn.html' with action='cancel' label='отменить заявку' uid=pageuser.id %}
@@ -30,8 +29,8 @@
           {% include 'friends/_btn.html' with action='reject' label='отклонить' uid=pageuser.id %}
         {% else %}
           {% include 'friends/_btn.html' with action='add' label='добавить в друзья' uid=pageuser.id %}
-          {% if can_message %}<a href="{% url 'messaging:open' pageuser.id %}">написать сообщение</a>{% endif %}
         {% endif %}
+        {% if can_message %}<a href="{% url 'messaging:open' pageuser.id %}">написать сообщение</a>{% endif %}
       {% endif %}
     </div>
   </div>
