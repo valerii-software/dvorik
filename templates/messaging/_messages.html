@@ -2,14 +2,17 @@
   {% if messages_list %}
     {% for m in messages_list %}
       <div class="message">
-        <div>
-          <a href="{% url 'profiles:view' m.sender.id %}"><b>{{ m.sender.first_name }} {{ m.sender.last_name }}</b></a>
-          <span class="muted">— {{ m.created_at|date:"j E Y, H:i" }}</span>
+        <a href="{% url 'profiles:view' m.sender.id %}"><img class="ava" src="{{ m.sender.profile.avatar_url }}"></a>
+        <div class="body">
+          <div>
+            <a href="{% url 'profiles:view' m.sender.id %}"><b>{{ m.sender.first_name }} {{ m.sender.last_name }}</b></a>
+            <span class="muted">— {{ m.created_at|date:"j E Y, H:i" }}</span>
+          </div>
+          {% if m.image %}
+            <div class="wall-image"><a href="{{ m.image.url }}" target="_blank"><img src="{{ m.image.url }}" alt=""></a></div>
+          {% endif %}
+          {% if m.text %}<div class="text">{{ m.text|linebreaksbr }}</div>{% endif %}
         </div>
-        {% if m.image %}
-          <div class="wall-image"><a href="{{ m.image.url }}" target="_blank"><img src="{{ m.image.url }}" alt=""></a></div>
-        {% endif %}
-        {% if m.text %}<div class="text">{{ m.text|linebreaksbr }}</div>{% endif %}
       </div>
     {% endfor %}
   {% else %}

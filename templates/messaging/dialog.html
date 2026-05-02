@@ -4,14 +4,18 @@
 {% block content %}
 {% if is_group %}
   <h1>{{ title }} <span class="muted" style="font-size:11px; font-weight:normal">[чат · {{ members|length }} участников]</span></h1>
-  <div class="muted" style="margin-bottom:8px">
+  <div class="muted" style="margin-bottom:4px">
     <a href="{% url 'messaging:inbox' %}">← Все диалоги</a>
+  </div>
+  <div class="chat-members">
     {% for m in members %}
-      <a href="{% url 'profiles:view' m.id %}">{{ m.first_name }} {{ m.last_name }}</a>{% if not forloop.last %}, {% endif %}
+      <a class="chat-member" href="{% url 'profiles:view' m.id %}">
+        <img src="{{ m.profile.avatar_url }}" alt="">
+        <span>{{ m.first_name }} {{ m.last_name }}</span>
+      </a>
     {% endfor %}
-    {% if dialog.created_by_id == request.user.id or request.user in members %}
-      ·
-      <form method="post" action="{% url 'messaging:leave_chat' dialog.id %}" style="display:inline" onsubmit="return confirm('Покинуть чат?')">
+    {% if request.user in members %}
+      <form method="post" action="{% url 'messaging:leave_chat' dialog.id %}" style="display:inline-block; margin-left:8px" onsubmit="return confirm('Покинуть чат?')">
         {% csrf_token %}<button class="link-btn" type="submit">покинуть</button>
       </form>
     {% endif %}
