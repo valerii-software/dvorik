@@ -13,9 +13,11 @@
     {{ wall_form.text }}
     <div style="margin-top:4px">
       <button class="btn btn-primary" type="submit">Отправить</button>
-      &nbsp;<a href="{{ graffiti_url }}">Оставить граффити</a>
     </div>
   </form>
+  <div style="margin-top:4px">
+    <a href="{{ graffiti_url }}">Оставить граффити</a>
+  </div>
 </div>
 
 {% include 'wall/_posts.html' with posts=posts owner=owner group=group %}
