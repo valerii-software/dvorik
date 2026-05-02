@@ -85,7 +85,20 @@ docker compose exec web python manage.py createsuperuser
 
 ### HTTPS
 
-`nginx.conf` слушает только 80. Для прода:
+`nginx.conf` слушает только 80. Production-настройки требуют HTTPS:
+браузер не примет `Secure`-куки на `http://`, поэтому login и POST-формы
+вернут 403. Если нужно временно подёргать сайт по голому HTTP (например,
+по IP пока DNS/TLS не готов) — поставь в `.env`:
+
+```env
+INSECURE_HTTP=1
+CSRF_TRUSTED_ORIGINS=http://1.2.3.4
+```
+
+Это снимет `Secure`-флаги c кук и HSTS. **Обязательно вернуть `INSECURE_HTTP=0`
+после поднятия HTTPS.**
+
+Для прода:
 - Поставьте перед нашим nginx ещё один прокси с TLS (Caddy / Traefik /
   Cloudflare Tunnel) — самый простой путь, бесплатные сертификаты.
 - Или допишите `server { listen 443 ssl; … }` в [nginx.conf](nginx.conf)
