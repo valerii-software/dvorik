@@ -40,7 +40,7 @@ def post(request, owner_id):
     owner = get_object_or_404(User, pk=owner_id)
     if not can_view(request.user, owner, owner.profile.privacy_wall_post):
         return redirect('profiles:view', user_id=owner_id)
-    form = WallPostForm(request.POST)
+    form = WallPostForm(request.POST, request.FILES)
     if form.is_valid():
         wp = form.save(commit=False)
         wp.owner = owner
@@ -58,7 +58,7 @@ def post_to_group(request, group_id):
     group = get_object_or_404(Group, pk=group_id)
     if not group.is_member(request.user) and group.owner_id != request.user.id:
         return redirect('groups:view', group_id=group.id)
-    form = WallPostForm(request.POST)
+    form = WallPostForm(request.POST, request.FILES)
     if form.is_valid():
         wp = form.save(commit=False)
         wp.group = group
