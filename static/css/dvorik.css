@@ -37,8 +37,7 @@ a:hover { text-decoration: underline; }
 
 /* ===== Sidebar counters ===== */
 .sidebar .counter {
-  color: #C03737;
-  font-weight: bold;
+  color: inherit;
 }
 
 /* ===== Pagination ===== */
