@@ -83,10 +83,55 @@
       </div>
     {% endif %}
 
-    {% if can_view_groups and user_groups %}
+    {% if can_view_photos and photo_count %}
       <div class="side-block">
         <div class="side-block-header">
-          Группы
+          Фотографии ({{ photo_count }})
+          <a class="side-link" href="{% url 'photos:user_albums' pageuser.id %}">все</a>
+        </div>
+        <div class="mini-photo-grid">
+          {% for p in recent_photos %}
+            <a href="{% url 'photos:photo' p.id %}"><img src="{{ p.thumbnail.url|default:p.image.url }}" alt=""></a>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    {% if can_view_video and video_count %}
+      <div class="side-block">
+        <div class="side-block-header">
+          Видеозаписи ({{ video_count }})
+          <a class="side-link" href="{% url 'video:user_videos' pageuser.id %}">все</a>
+        </div>
+        <div class="mini-video-grid">
+          {% for v in videos %}
+            <a class="mini-video" href="{% url 'video:view' v.id %}">
+              <img src="{{ v.preview_url }}" alt="">
+              <div class="title">{{ v.title|truncatechars:30 }}</div>
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    {% if can_view_audio and audio_count %}
+      <div class="side-block">
+        <div class="side-block-header">
+          Аудиозаписи ({{ audio_count }})
+          <a class="side-link" href="{% url 'audio:user_audio' pageuser.id %}">все</a>
+        </div>
+        <ul class="mini-audio-list">
+          {% for ua in audio_items %}
+            <li><b>{{ ua.track.artist|truncatechars:18 }}</b> — {{ ua.track.title|truncatechars:24 }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    {% if can_view_groups and group_count %}
+      <div class="side-block">
+        <div class="side-block-header">
+          Группы ({{ group_count }})
           <a class="side-link" href="{% url 'groups:user_groups' pageuser.id %}">все</a>
         </div>
         <div class="mini-friend-grid">
@@ -148,18 +193,6 @@
           </table>
         {% endif %}
       </div>
-    {% endif %}
-
-    {% if can_view_photos and recent_photos %}
-      <h2>Фотографии ({{ album_count }})</h2>
-      <div class="photo-grid">
-        {% for p in recent_photos %}
-          <a class="photo-thumb" href="{% url 'photos:photo' p.id %}">
-            <img src="{{ p.thumbnail.url|default:p.image.url }}" alt="">
-          </a>
-        {% endfor %}
-      </div>
-      <div style="margin-top:6px"><a href="{% url 'photos:user_albums' pageuser.id %}">Все фотографии →</a></div>
     {% endif %}
 
     {% if can_view_photos and photos_with_user %}

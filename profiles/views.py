@@ -7,9 +7,11 @@ from datetime import timedelta
 
 from django.utils import timezone
 
+from audio.models import UserAudio
 from friends.models import Friendship
 from groups.models import Group
 from photos.models import Album, Photo
+from video.models import Video
 from wall.forms import WallPostForm
 from wall.models import WallPost
 
@@ -55,15 +57,30 @@ def view_profile(request, user_id):
     if flags['can_view_wall']:
         posts = WallPost.objects.filter(owner=user).select_related('author', 'author__profile')
 
-    album_count = recent_photos = photos_with_user = None
+    album_count = photo_count = recent_photos = photos_with_user = None
     if flags['can_view_photos']:
         album_count = Album.objects.filter(owner=user).count()
+        photo_count = Photo.objects.filter(album__owner=user).count()
         recent_photos = Photo.objects.filter(album__owner=user).order_by('-created_at')[:6]
         photos_with_user = Photo.objects.filter(tags__user=user).distinct().order_by('-created_at')[:6]
 
-    user_groups = None
+    user_groups = group_count = None
     if flags['can_view_groups']:
-        user_groups = Group.objects.filter(memberships__user=user).distinct()[:6]
+        groups_qs = Group.objects.filter(memberships__user=user).distinct()
+        group_count = groups_qs.count()
+        user_groups = groups_qs[:6]
+
+    videos = video_count = None
+    if flags['can_view_video']:
+        videos_qs = Video.objects.filter(owner=user)
+        video_count = videos_qs.count()
+        videos = videos_qs[:4]
+
+    audio_items = audio_count = None
+    if flags['can_view_audio']:
+        audio_qs = UserAudio.objects.filter(user=user).select_related('track')
+        audio_count = audio_qs.count()
+        audio_items = audio_qs[:5]
 
     return render(request, 'profiles/view.html', {
         'section': 'profile' if is_me else None,
@@ -78,9 +95,15 @@ def view_profile(request, user_id):
         'posts': posts,
         'wall_form': WallPostForm(),
         'album_count': album_count,
+        'photo_count': photo_count,
         'recent_photos': recent_photos,
         'photos_with_user': photos_with_user,
         'user_groups': user_groups,
+        'group_count': group_count,
+        'videos': videos,
+        'video_count': video_count,
+        'audio_items': audio_items,
+        'audio_count': audio_count,
         'completion': profile.completion() if is_me else None,
         **flags,
     })
