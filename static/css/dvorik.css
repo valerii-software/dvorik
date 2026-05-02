@@ -563,10 +563,17 @@ textarea { resize: vertical; }
   border-top: 1px solid #DAE1E8;
   font-size: 11px;
 }
-.msg-pager a, .msg-pager .disabled {
-  margin: 0 8px;
+.msg-pager a, .msg-pager .disabled, .msg-pager .current, .msg-pager .muted {
+  display: inline-block;
+  padding: 1px 6px;
+  margin: 0 1px;
 }
 .msg-pager .disabled { color: #BBB; }
+.msg-pager .current {
+  background: #45668E;
+  color: #fff;
+  font-weight: bold;
+}
 
 .message {
   padding: 6px 0;

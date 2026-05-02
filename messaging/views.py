@@ -16,7 +16,7 @@ MESSAGES_PER_PAGE = 20
 
 
 def _paginate_messages(dialog, page_num):
-    """Returns (messages_in_chronological_order, page_obj). Page 1 = newest."""
+    """Returns (messages_in_chronological_order, page_obj, page_range). Page 1 = newest."""
     qs = (
         dialog.messages
         .select_related('sender', 'sender__profile')
@@ -24,7 +24,10 @@ def _paginate_messages(dialog, page_num):
     )
     paginator = Paginator(qs, MESSAGES_PER_PAGE)
     page = paginator.get_page(page_num)
-    return list(reversed(page.object_list)), page
+    page_range = list(paginator.get_elided_page_range(
+        page.number, on_each_side=2, on_ends=1,
+    ))
+    return list(reversed(page.object_list)), page, page_range
 
 User = get_user_model()
 
@@ -82,7 +85,7 @@ def open_chat(request, dialog_id):
 
 def _render_chat(request, dialog):
     dialog.messages.filter(read=False).exclude(sender=request.user).update(read=True)
-    msgs, page = _paginate_messages(dialog, request.GET.get('page', 1))
+    msgs, page, page_range = _paginate_messages(dialog, request.GET.get('page', 1))
     members = list(dialog.participants.select_related('profile').all())
     is_creator = dialog.is_group and dialog.created_by_id == request.user.id
     addable = []
@@ -100,6 +103,8 @@ def _render_chat(request, dialog):
         'addable_friends': addable,
         'messages_list': msgs,
         'page': page,
+        'page_range': page_range,
+        'ellipsis': Paginator.ELLIPSIS,
     })
 
 
@@ -125,9 +130,10 @@ def send(request, dialog_id):
         dialog.last_message_at = timezone.now()
         dialog.save(update_fields=['last_message_at'])
     if request.headers.get('HX-Request'):
-        msgs, page = _paginate_messages(dialog, 1)
+        msgs, page, page_range = _paginate_messages(dialog, 1)
         return render(request, 'messaging/_messages.html', {
             'messages_list': msgs, 'dialog': dialog, 'page': page,
+            'page_range': page_range, 'ellipsis': Paginator.ELLIPSIS,
         })
     return redirect('messaging:open_chat', dialog_id=dialog.id)
 
