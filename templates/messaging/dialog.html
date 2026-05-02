@@ -7,14 +7,21 @@
 
 {% include 'messaging/_messages.html' with messages_list=messages_list dialog=dialog other=other %}
 
-<form method="post" action="{% url 'messaging:send' dialog.id %}"
+<form method="post" action="{% url 'messaging:send' dialog.id %}" enctype="multipart/form-data"
       hx-post="{% url 'messaging:send' dialog.id %}"
       hx-target="#messages" hx-swap="outerHTML"
       hx-select="#messages"
+      hx-encoding="multipart/form-data"
       hx-on::after-request="this.reset()"
       style="margin-top:10px">
   {% csrf_token %}
-  <textarea name="text" rows="3" style="width:100%" placeholder="Ваше сообщение…" required></textarea>
-  <div style="margin-top:4px"><button class="btn btn-primary" type="submit">Отправить</button></div>
+  <textarea name="text" rows="3" style="width:100%" placeholder="Ваше сообщение…"></textarea>
+  <div style="margin-top:4px; display:flex; align-items:center; gap:8px;">
+    <button class="btn btn-primary" type="submit">Отправить</button>
+    <label class="file-pick">
+      <span class="file-pick-label">📎 Прикрепить изображение</span>
+      <input type="file" name="image" accept="image/*">
+    </label>
+  </div>
 </form>
 {% endblock %}

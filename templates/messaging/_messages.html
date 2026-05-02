@@ -6,7 +6,10 @@
           <a href="{% url 'profiles:view' m.sender.id %}"><b>{{ m.sender.first_name }} {{ m.sender.last_name }}</b></a>
           <span class="muted">— {{ m.created_at|date:"j E Y, H:i" }}</span>
         </div>
-        <div class="text">{{ m.text|linebreaksbr }}</div>
+        {% if m.image %}
+          <div class="wall-image"><a href="{{ m.image.url }}" target="_blank"><img src="{{ m.image.url }}" alt=""></a></div>
+        {% endif %}
+        {% if m.text %}<div class="text">{{ m.text|linebreaksbr }}</div>{% endif %}
       </div>
     {% endfor %}
   {% else %}

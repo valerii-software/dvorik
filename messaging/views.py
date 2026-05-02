@@ -63,8 +63,12 @@ def send(request, dialog_id):
     if not has_history and not can_view(request.user, other, other.profile.privacy_messages):
         return _denied(request, other, 'Этот пользователь принимает сообщения только от указанного круга людей.')
     text = request.POST.get('text', '').strip()
-    if text:
-        Message.objects.create(dialog=dialog, sender=request.user, text=text)
+    image = request.FILES.get('image')
+    if text or image:
+        Message.objects.create(
+            dialog=dialog, sender=request.user,
+            text=text, image=image,
+        )
         dialog.last_message_at = timezone.now()
         dialog.save(update_fields=['last_message_at'])
     if request.headers.get('HX-Request'):
