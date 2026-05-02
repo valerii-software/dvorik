@@ -2,6 +2,7 @@ from django.contrib import messages as flash
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
@@ -37,6 +38,19 @@ def _denied(request, other, message):
         'pageuser': other,
         'message': message,
     }, status=403)
+
+
+@login_required
+def unread_count(request):
+    """Cheap JSON endpoint polled by the notification JS in base.html."""
+    n = (
+        Message.objects
+        .filter(dialog__participants=request.user, read=False)
+        .exclude(sender=request.user)
+        .distinct()
+        .count()
+    )
+    return JsonResponse({'count': n})
 
 
 @login_required

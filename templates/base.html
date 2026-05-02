@@ -8,6 +8,16 @@
   <link rel="stylesheet" href="{% static 'css/dvorik.css' %}">
   <script src="https://unpkg.com/htmx.org@1.9.12"></script>
   <script src="{% static 'js/audio_player.js' %}" defer></script>
+  {% if user.is_authenticated %}
+    <script>
+      window.__DVORIK_NOTIF__ = {
+        url: '{% url "messaging:unread_count" %}',
+        sound: '{% static "sounds/message.mp3" %}',
+        baseTitle: document.title,
+      };
+    </script>
+    <script src="{% static 'js/notifications.js' %}" defer></script>
+  {% endif %}
 </head>
 <body hx-boost="true" hx-target="#page-body" hx-select="#page-body" hx-swap="outerHTML show:window:top">
 

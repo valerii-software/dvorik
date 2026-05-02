@@ -6,6 +6,7 @@ app_name = 'messaging'
 
 urlpatterns = [
     path('', views.inbox, name='inbox'),
+    path('unread-count/', views.unread_count, name='unread_count'),
     path('open/<int:user_id>/', views.open_dialog, name='open'),
     path('chat/<int:dialog_id>/', views.open_chat, name='open_chat'),
     path('send/<int:dialog_id>/', views.send, name='send'),
