@@ -733,6 +733,20 @@ canvas#graffiti {
   border: 1px solid #ABB6C2;
   display: block;
 }
+.file-pick {
+  cursor: pointer;
+  font-size: 11px;
+  color: #2B587A;
+}
+.file-pick:hover .file-pick-label { text-decoration: underline; }
+.file-pick input[type="file"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
 
 /* ===== Feed ===== */
 .feed-target {

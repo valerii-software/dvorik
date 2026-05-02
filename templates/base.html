@@ -133,6 +133,18 @@
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && !overlay.hidden) close();
   });
+
+  // .file-pick — show selected filename inside the label after the user picks a file.
+  document.addEventListener('change', function (e) {
+    const input = e.target;
+    if (input.matches('.file-pick input[type="file"]')) {
+      const label = input.closest('.file-pick').querySelector('.file-pick-label');
+      if (label) {
+        const f = input.files && input.files[0];
+        label.textContent = f ? '📎 ' + f.name : '📎 Прикрепить изображение';
+      }
+    }
+  });
 })();
 
 window.__initGraffiti = function () {
