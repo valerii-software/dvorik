@@ -1,9 +1,11 @@
 {% if not page or page.number == 1 %}
 <div id="messages"
      hx-get="{% url 'messaging:open_chat' dialog.id %}"
-     hx-trigger="every 5s [document.visibilityState === 'visible']"
+     hx-trigger="every 5s"
+     hx-target="this"
      hx-swap="outerHTML"
-     hx-select="#messages">
+     hx-select="#messages"
+     hx-disinherit="hx-target hx-swap">
 {% else %}
 <div id="messages">
 {% endif %}
