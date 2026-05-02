@@ -29,6 +29,8 @@ INSTALLED_APPS = [
     'wall',
     'messaging',
     'photos',
+    'audio',
+    'video',
 ]
 
 MIDDLEWARE = [

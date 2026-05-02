@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}{% if is_me %}Мои аудиозаписи{% else %}Аудиозаписи — {{ pageuser.get_full_name }}{% endif %}{% endblock %}
+
+{% block content %}
+<h1>
+  {% if is_me %}Мои аудиозаписи
+  {% else %}Аудиозаписи пользователя <a href="{% url 'profiles:view' pageuser.id %}">{{ pageuser.get_full_name }}</a>
+  {% endif %}
+  ({{ items|length }})
+</h1>
+
+{% if is_me %}
+  <div style="margin-bottom:10px">
+    <a class="btn btn-primary" href="{% url 'audio:upload' %}">Загрузить</a>
+    &nbsp;<a class="btn" href="{% url 'audio:search' %}">Поиск аудиозаписей</a>
+  </div>
+{% endif %}
+
+{% if items %}
+  {% for ua in items %}
+    {% include 'audio/_row.html' with track=ua.track show_remove=is_me %}
+  {% endfor %}
+{% else %}
+  <div class="empty">Пока пусто.</div>
+{% endif %}
+{% endblock %}

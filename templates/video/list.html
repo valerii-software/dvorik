@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}{% if is_me %}Мои видеозаписи{% else %}Видеозаписи — {{ pageuser.get_full_name }}{% endif %}{% endblock %}
+
+{% block content %}
+<h1>
+  {% if is_me %}Мои видеозаписи
+  {% else %}Видеозаписи пользователя <a href="{% url 'profiles:view' pageuser.id %}">{{ pageuser.get_full_name }}</a>
+  {% endif %}
+  ({{ videos|length }})
+</h1>
+
+{% if is_me %}
+  <div style="margin-bottom:10px"><a class="btn btn-primary" href="{% url 'video:upload' %}">Загрузить видео</a></div>
+{% endif %}
+
+{% if videos %}
+  <div class="video-grid">
+    {% for v in videos %}
+      <div class="video-card">
+        <a href="{% url 'video:view' v.id %}"><img src="{{ v.preview_url }}" alt=""></a>
+        <a class="title" href="{% url 'video:view' v.id %}">{{ v.title }}</a>
+        <div class="muted">{{ v.created_at|date:"j M Y" }}</div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty">Видео пока нет.</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Поиск аудиозаписей — ВКонтакте{% endblock %}
+
+{% block content %}
+<h1>Поиск аудиозаписей</h1>
+
+<form method="get" style="margin-bottom:14px">
+  <div class="form-row">
+    <label>Исполнитель / название</label>
+    <input type="text" name="q" value="{{ q }}" autofocus>
+    <button class="btn btn-primary" type="submit">Искать</button>
+  </div>
+</form>
+
+{% if q %}
+  <h2>Результаты ({{ results|length }})</h2>
+  {% if results %}
+    {% for track in results %}
+      {% include 'audio/_row.html' with track=track show_remove=False %}
+    {% endfor %}
+  {% else %}
+    <div class="empty">Ничего не найдено.</div>
+  {% endif %}
+{% endif %}
+{% endblock %}

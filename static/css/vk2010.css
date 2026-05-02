@@ -324,6 +324,52 @@ textarea { resize: vertical; }
 }
 .link-btn:hover { color: #b00; }
 
+/* ===== Audio ===== */
+.audio-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 4px;
+  border-bottom: 1px solid #EEE;
+}
+.audio-row .audio-meta { flex: 1; min-width: 0; }
+.audio-row audio { height: 26px; width: 240px; }
+.audio-row .audio-actions { display: flex; align-items: center; gap: 6px; }
+
+/* ===== Video ===== */
+.video-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+.video-card {
+  width: 180px;
+}
+.video-card img {
+  width: 180px;
+  height: 135px;
+  object-fit: cover;
+  border: 1px solid #ABB6C2;
+  display: block;
+}
+.video-card .title {
+  display: block;
+  margin-top: 4px;
+  line-height: 1.2;
+}
+
+.video-view {
+  text-align: center;
+  background: #000;
+  border: 1px solid #DAE1E8;
+}
+.video-view video {
+  max-width: 100%;
+  max-height: 480px;
+  display: block;
+  margin: 0 auto;
+}
+
 /* ===== Footer ===== */
 .footer {
   width: 800px;

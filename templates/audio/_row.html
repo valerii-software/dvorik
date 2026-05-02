@@ -1,0 +1,24 @@
+<div class="audio-row">
+  <div class="audio-meta">
+    <b>{{ track.artist }}</b> — {{ track.title }}
+  </div>
+  <audio controls preload="none" src="{{ track.file.url }}"></audio>
+  <div class="audio-actions">
+    {% if show_remove %}
+      <form method="post" action="{% url 'audio:remove' track.id %}" style="display:inline">
+        {% csrf_token %}<button class="link-btn" type="submit" title="Убрать из моих">×</button>
+      </form>
+    {% elif track.id in my_track_ids %}
+      <span class="muted">в моих</span>
+    {% else %}
+      <form method="post" action="{% url 'audio:add' track.id %}" style="display:inline">
+        {% csrf_token %}<button class="btn" type="submit">+ в мои</button>
+      </form>
+    {% endif %}
+    {% if track.uploader_id == request.user.id and show_remove %}
+      <form method="post" action="{% url 'audio:delete' track.id %}" style="display:inline" onsubmit="return confirm('Удалить аудиозапись насовсем?')">
+        {% csrf_token %}<button class="link-btn" type="submit" title="Удалить из системы">удалить</button>
+      </form>
+    {% endif %}
+  </div>
+</div>

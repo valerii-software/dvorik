@@ -30,6 +30,8 @@
       <li><a href="{% url 'friends:my_friends' %}" class="{% if section == 'friends' %}active{% endif %}">Мои друзья</a></li>
       <li><a href="{% url 'photos:my_albums' %}" class="{% if section == 'photos' %}active{% endif %}">Мои фотографии</a></li>
       <li><a href="{% url 'photos:with_me' %}" class="{% if section == 'with_me' %}active{% endif %}">Фото со мной</a></li>
+      <li><a href="{% url 'video:my_videos' %}" class="{% if section == 'video' %}active{% endif %}">Мои видеозаписи</a></li>
+      <li><a href="{% url 'audio:my_audio' %}" class="{% if section == 'audio' %}active{% endif %}">Мои аудиозаписи</a></li>
       <li><a href="{% url 'messaging:inbox' %}" class="{% if section == 'messages' %}active{% endif %}">Мои сообщения</a></li>
       <li><a href="{% url 'friends:requests' %}" class="{% if section == 'requests' %}active{% endif %}">Заявки в друзья</a></li>
       <li><a href="{% url 'friends:search' %}" class="{% if section == 'search' %}active{% endif %}">Поиск людей</a></li>

@@ -14,6 +14,8 @@ urlpatterns = [
     path('wall/', include('wall.urls')),
     path('messages/', include('messaging.urls')),
     path('photos/', include('photos.urls')),
+    path('audio/', include('audio.urls')),
+    path('video/', include('video.urls')),
 ]
 
 if settings.DEBUG:

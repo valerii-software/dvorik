@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}{{ video.title }} — ВКонтакте{% endblock %}
+
+{% block content %}
+<div class="muted" style="margin-bottom:4px">
+  <a href="{% url 'video:user_videos' video.owner.id %}">Видеозаписи пользователя {{ video.owner.get_full_name }}</a>
+</div>
+<h1>{{ video.title }}</h1>
+
+<div class="video-view">
+  <video controls preload="metadata" {% if video.preview %}poster="{{ video.preview.url }}"{% endif %} src="{{ video.file.url }}"></video>
+</div>
+
+{% if video.description %}<div style="margin:8px 0">{{ video.description|linebreaksbr }}</div>{% endif %}
+
+<div class="muted">
+  Загрузил <a href="{% url 'profiles:view' video.owner.id %}">{{ video.owner.get_full_name }}</a>
+  · {{ video.created_at|date:"j E Y, H:i" }}
+</div>
+
+{% if is_owner %}
+  <form method="post" action="{% url 'video:delete' video.id %}" style="margin-top:6px" onsubmit="return confirm('Удалить видео?')">
+    {% csrf_token %}<button class="btn" type="submit">Удалить видео</button>
+  </form>
+{% endif %}
+{% endblock %}
