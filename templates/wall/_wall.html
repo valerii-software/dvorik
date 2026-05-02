@@ -9,7 +9,7 @@
   <form method="post" action="{{ post_url }}"
         hx-post="{{ post_url }}"
         hx-target="#wall-posts" hx-swap="outerHTML"
-        hx-disinherit="hx-select hx-target hx-swap">
+        hx-select="#wall-posts">
     {% csrf_token %}
     {{ wall_form.text }}
     <div style="margin-top:4px">
