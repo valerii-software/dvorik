@@ -7,7 +7,7 @@
   <script src="https://unpkg.com/htmx.org@1.9.12"></script>
   <script src="{% static 'js/audio_player.js' %}" defer></script>
 </head>
-<body>
+<body hx-boost="true" hx-target="#page-body" hx-select="#page-body" hx-swap="outerHTML show:window:top">
 
 {% if user.is_authenticated %}
 <div class="topbar">
@@ -37,7 +37,7 @@
   </div>
 </div>
 
-<div id="page-body" hx-boost="true" hx-target="#page-body" hx-select="#page-body" hx-swap="outerHTML show:window:top">
+<div id="page-body">
 <div class="layout">
   <div class="sidebar">
     <ul>

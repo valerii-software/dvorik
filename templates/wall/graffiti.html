@@ -31,7 +31,7 @@
 
 <canvas id="graffiti" width="586" height="408"></canvas>
 
-<form method="post" action="{{ save_url }}" id="save-form" style="margin-top:10px">
+<form method="post" action="{{ save_url }}" id="save-form" hx-boost="false" style="margin-top:10px">
   {% csrf_token %}
   <input type="hidden" name="image_data" id="image-data">
   <button class="btn btn-primary" type="submit">Сохранить на стену</button>
