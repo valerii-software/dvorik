@@ -1,13 +1,4 @@
 <div id="messages">
-  {% if page %}
-    {% if page.has_next or page.number > 1 %}
-      <div class="msg-pager">
-        {% if page.has_next %}<a href="?page={{ page.next_page_number }}">← Старее</a>{% else %}<span class="disabled">← Старее</span>{% endif %}
-        <span class="muted">стр. {{ page.number }} из {{ page.paginator.num_pages }}</span>
-        {% if page.number > 1 %}<a href="?page={% if page.previous_page_number == 1 %}1{% else %}{{ page.previous_page_number }}{% endif %}">Новее →</a>{% else %}<span class="disabled">Новее →</span>{% endif %}
-      </div>
-    {% endif %}
-  {% endif %}
   {% if messages_list %}
     {% for m in messages_list %}
       <div class="message">
@@ -26,5 +17,12 @@
     {% endfor %}
   {% else %}
     <div class="empty">Сообщений пока нет. Напишите первое!</div>
+  {% endif %}
+  {% if page and page.paginator.num_pages > 1 %}
+    <div class="msg-pager">
+      {% if page.has_next %}<a href="?page={{ page.next_page_number }}">← Старее</a>{% else %}<span class="disabled">← Старее</span>{% endif %}
+      <span class="muted">стр. {{ page.number }} из {{ page.paginator.num_pages }}</span>
+      {% if page.number > 1 %}<a href="?page={{ page.previous_page_number }}">Новее →</a>{% else %}<span class="disabled">Новее →</span>{% endif %}
+    </div>
   {% endif %}
 </div>

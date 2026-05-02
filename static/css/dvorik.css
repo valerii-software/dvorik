@@ -558,9 +558,9 @@ textarea { resize: vertical; }
 
 .msg-pager {
   text-align: center;
-  padding: 6px 0;
-  margin-bottom: 4px;
-  border-bottom: 1px solid #DAE1E8;
+  padding: 8px 0 4px;
+  margin-top: 4px;
+  border-top: 1px solid #DAE1E8;
   font-size: 11px;
 }
 .msg-pager a, .msg-pager .disabled {

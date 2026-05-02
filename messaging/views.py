@@ -12,7 +12,7 @@ from profiles.permissions import can_view
 from .models import Dialog, Message
 
 
-MESSAGES_PER_PAGE = 30
+MESSAGES_PER_PAGE = 20
 
 
 def _paginate_messages(dialog, page_num):
