@@ -27,7 +27,7 @@ def notifications(request):
         )
         news_unseen = (
             WallPost.objects
-            .filter(Q(owner_id__in=friend_ids) | Q(group_id__in=group_ids))
+            .filter(Q(owner_id__in=friend_ids + [user.id]) | Q(group_id__in=group_ids))
             .exclude(author=user)
             .filter(created_at__gt=seen_at)
             .count()
