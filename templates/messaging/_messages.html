@@ -1,13 +1,4 @@
-{% if not page or page.number == 1 %}
-<div id="messages"
-     hx-get="{% url 'messaging:open_chat' dialog.id %}"
-     hx-trigger="every 5s"
-     hx-target="this"
-     hx-swap="outerHTML"
-     hx-select="#messages">
-{% else %}
 <div id="messages">
-{% endif %}
   {% if messages_list %}
     {% for m in messages_list %}
       <div class="message">

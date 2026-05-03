@@ -45,7 +45,17 @@
   <div style="margin-bottom:8px"><a href="{% url 'messaging:inbox' %}">← Все диалоги</a></div>
 {% endif %}
 
+{% if not page or page.number == 1 %}
+<div hx-get="{% url 'messaging:open_chat' dialog.id %}"
+     hx-trigger="every 5s"
+     hx-target="#messages"
+     hx-swap="outerHTML"
+     hx-select="#messages">
 {% include 'messaging/_messages.html' with messages_list=messages_list dialog=dialog %}
+</div>
+{% else %}
+{% include 'messaging/_messages.html' with messages_list=messages_list dialog=dialog %}
+{% endif %}
 
 <form method="post" action="{% url 'messaging:send' dialog.id %}" enctype="multipart/form-data"
       hx-post="{% url 'messaging:send' dialog.id %}"
