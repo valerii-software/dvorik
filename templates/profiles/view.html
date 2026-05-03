@@ -25,7 +25,7 @@
       {% else %}
         {% if friend_state == 'friends' %}
           <span class="muted">Вы друзья</span>
-          {% include 'friends/_btn.html' with action='remove' label='удалить из друзей' uid=pageuser.id %}
+          {% include 'friends/_btn.html' with action='remove' label='удалить из друзей' uid=pageuser.id confirm='Удалить из друзей?' %}
         {% elif friend_state == 'sent' %}
           <span class="muted">Заявка отправлена</span>
           {% include 'friends/_btn.html' with action='cancel' label='отменить заявку' uid=pageuser.id %}
