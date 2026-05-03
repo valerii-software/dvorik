@@ -35,7 +35,7 @@
     <form method="post" action="{% url 'photos:set_cover' photo.id %}" style="display:inline">
       {% csrf_token %}<button class="btn" type="submit">Сделать обложкой</button>
     </form>
-    <form method="post" action="{% url 'photos:delete_photo' photo.id %}" style="display:inline" onsubmit="return confirm('Удалить фото?')">
+    <form method="post" action="{% url 'photos:delete_photo' photo.id %}" style="display:inline" hx-confirm="Удалить фото?">
       {% csrf_token %}<button class="btn" type="submit">Удалить фото</button>
     </form>
   </div>

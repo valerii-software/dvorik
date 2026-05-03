@@ -19,7 +19,7 @@
 </div>
 
 {% if is_owner %}
-  <form method="post" action="{% url 'video:delete' video.id %}" style="margin-top:6px" onsubmit="return confirm('Удалить видео?')">
+  <form method="post" action="{% url 'video:delete' video.id %}" style="margin-top:6px" hx-confirm="Удалить видео?">
     {% csrf_token %}<button class="btn" type="submit">Удалить видео</button>
   </form>
 {% endif %}

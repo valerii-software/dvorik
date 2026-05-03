@@ -22,7 +22,7 @@
       </form>
     {% endif %}
     {% if track.uploader_id == request.user.id and show_remove %}
-      <form method="post" action="{% url 'audio:delete' track.id %}" style="display:inline" onsubmit="return confirm('Удалить аудиозапись насовсем?')">
+      <form method="post" action="{% url 'audio:delete' track.id %}" style="display:inline" hx-confirm="Удалить аудиозапись насовсем?">
         {% csrf_token %}<button class="link-btn" type="submit" title="Удалить из системы">удалить</button>
       </form>
     {% endif %}
