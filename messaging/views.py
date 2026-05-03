@@ -43,9 +43,12 @@ def _denied(request, other, message):
 @login_required
 def unread_count(request):
     """Cheap JSON endpoint polled by the notification JS in base.html.
-    Returns both new-message and pending-friend-request counters so the
-    sidebar badges can stay in sync without a page reload."""
+    Returns new-message, pending-friend-request and unseen-news counters
+    so the sidebar badges can stay in sync without a page reload."""
+    from django.db.models import Q
     from friends.models import Friendship
+    from groups.models import GroupMember
+    from wall.models import WallPost
     n = (
         Message.objects
         .filter(dialog__participants=request.user, read=False)
@@ -56,10 +59,25 @@ def unread_count(request):
     pending = Friendship.objects.filter(
         to_user=request.user, status=Friendship.PENDING,
     ).count()
+    news_unseen = 0
+    seen_at = getattr(request.user.profile, 'news_seen_at', None)
+    if seen_at is not None:
+        friend_ids = list(Friendship.friends_qs(request.user).values_list('id', flat=True))
+        group_ids = list(
+            GroupMember.objects.filter(user=request.user).values_list('group_id', flat=True)
+        )
+        news_unseen = (
+            WallPost.objects
+            .filter(Q(owner_id__in=friend_ids) | Q(group_id__in=group_ids))
+            .exclude(author=request.user)
+            .filter(created_at__gt=seen_at)
+            .count()
+        )
     return JsonResponse({
         'count': n,                 # backwards-compat alias for `messages`
         'messages': n,
         'requests': pending,
+        'news': news_unseen,
     })
 
 

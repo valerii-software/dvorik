@@ -84,6 +84,7 @@ class Profile(models.Model):
                                         choices=PRIVACY_CHOICES, default='all')
 
     last_seen = models.DateTimeField(null=True, blank=True, db_index=True)
+    news_seen_at = models.DateTimeField(null=True, blank=True)
 
     now_playing = models.ForeignKey(
         'audio.AudioTrack', on_delete=models.SET_NULL,

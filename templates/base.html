@@ -54,7 +54,7 @@
   <div class="sidebar">
     <ul>
       <li><a href="{% url 'profiles:my_page' %}" class="{% if section == 'profile' %}active{% endif %}">Моя страница</a></li>
-      <li><a href="{% url 'feed:news' %}" class="{% if section == 'news' %}active{% endif %}">Мои новости</a></li>
+      <li><a href="{% url 'feed:news' %}" class="{% if section == 'news' %}active{% endif %}">Мои новости<span class="counter" data-counter="news">{% if nav_news_unseen %} ({{ nav_news_unseen }}){% endif %}</span></a></li>
       <li><a href="{% url 'friends:my_friends' %}" class="{% if section == 'friends' %}active{% endif %}">Мои друзья</a></li>
       <li><a href="{% url 'photos:my_albums' %}" class="{% if section == 'photos' %}active{% endif %}">Мои фотографии</a></li>
       <li><a href="{% url 'photos:with_me' %}" class="{% if section == 'with_me' %}active{% endif %}">Фото со мной</a></li>

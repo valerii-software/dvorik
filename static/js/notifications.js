@@ -44,6 +44,7 @@
         if (!data) return;
         const messages = (data.messages != null ? data.messages : data.count) | 0;
         const requests = (data.requests || 0) | 0;
+        const news = (data.news || 0) | 0;
         if (lastMessages !== null && messages > lastMessages) {
           // count went up — play sound (best-effort, may be blocked
           // until first user gesture).
@@ -53,6 +54,7 @@
         syncTitle(messages);
         syncCounter('messages', messages);
         syncCounter('requests', requests);
+        syncCounter('news', news);
       })
       .catch(function () {});
   }

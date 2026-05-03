@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.shortcuts import render
+from django.utils import timezone
 
 from friends.models import Friendship
 from groups.models import GroupMember
@@ -19,6 +20,9 @@ def news(request):
         .select_related('author', 'author__profile', 'owner', 'group')
         .order_by('-created_at')[:50]
     )
+    profile = request.user.profile
+    profile.news_seen_at = timezone.now()
+    profile.save(update_fields=['news_seen_at'])
     return render(request, 'feed/news.html', {
         'section': 'news',
         'posts': posts,
