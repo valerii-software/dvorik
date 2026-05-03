@@ -61,8 +61,8 @@
       <li><a href="{% url 'video:my_videos' %}" class="{% if section == 'video' %}active{% endif %}">Мои видеозаписи</a></li>
       <li><a href="{% url 'audio:my_audio' %}" class="{% if section == 'audio' %}active{% endif %}">Мои аудиозаписи</a></li>
       <li><a href="{% url 'groups:my_groups' %}" class="{% if section == 'my_groups' %}active{% endif %}">Мои группы</a></li>
-      <li><a href="{% url 'messaging:inbox' %}" class="{% if section == 'messages' %}active{% endif %}">Мои сообщения{% if nav_unread_messages %} <span class="counter">({{ nav_unread_messages }})</span>{% endif %}</a></li>
-      <li><a href="{% url 'friends:requests' %}" class="{% if section == 'requests' %}active{% endif %}">Заявки в друзья{% if nav_pending_requests %} <span class="counter">({{ nav_pending_requests }})</span>{% endif %}</a></li>
+      <li><a href="{% url 'messaging:inbox' %}" class="{% if section == 'messages' %}active{% endif %}">Мои сообщения<span class="counter" data-counter="messages">{% if nav_unread_messages %} ({{ nav_unread_messages }}){% endif %}</span></a></li>
+      <li><a href="{% url 'friends:requests' %}" class="{% if section == 'requests' %}active{% endif %}">Заявки в друзья<span class="counter" data-counter="requests">{% if nav_pending_requests %} ({{ nav_pending_requests }}){% endif %}</span></a></li>
       <li><a href="{% url 'friends:search' %}" class="{% if section == 'search' %}active{% endif %}">Поиск людей</a></li>
       <li><a href="{% url 'profiles:edit' %}" class="{% if section == 'edit' %}active{% endif %}">Мои настройки</a></li>
       <li><a href="{% url 'profiles:privacy' %}" class="{% if section == 'privacy' %}active{% endif %}">Приватность</a></li>
