@@ -9,7 +9,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('healthz/', project_views.healthz),
     path('', lambda r: redirect('profiles:my_page') if r.user.is_authenticated
-         else redirect('accounts:register')),
+         else redirect('accounts:login')),
     path('accounts/', include('accounts.urls')),
     path('id/', include('profiles.urls')),
     path('friends/', include('friends.urls')),

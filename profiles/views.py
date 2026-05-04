@@ -24,7 +24,7 @@ User = get_user_model()
 
 def my_page(request):
     if not request.user.is_authenticated:
-        return redirect('accounts:register')
+        return redirect('accounts:login')
     return redirect('profiles:view', user_id=request.user.id)
 
 
