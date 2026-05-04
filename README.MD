@@ -1,28 +1,66 @@
 # Дворик
 
-Социальная сеть с интерфейсом и атмосферой 2010 года на современном стеке.
-Вдохновлено «эпохой стены» (до октября 2010), сделано не как клон, а как
-самостоятельный проект с собственным брендом.
+> Социальная сеть в стилистике 2010 года на современном стеке.
+> Не клон — самостоятельный проект с собственным брендом, вдохновлённый
+> «эпохой стены» (до октября 2010).
 
-🔗 <https://github.com/valerii-software/dvorik>
+**🌐 Живая версия — [dvorik.site](https://dvorik.site)**
 
-**Стек:** Django 5 · Templates · HTMX · PostgreSQL · Redis · gunicorn · nginx · Pillow.
+[![Stack](https://img.shields.io/badge/Django-5-092E20?logo=django)](https://www.djangoproject.com/)
+[![Stack](https://img.shields.io/badge/HTMX-1.9-3D72D7?logo=htmx)](https://htmx.org/)
+[![Stack](https://img.shields.io/badge/Postgres-16-336791?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Stack](https://img.shields.io/badge/Redis-7-DC382D?logo=redis&logoColor=white)](https://redis.io/)
+[![Stack](https://img.shields.io/badge/nginx-alpine-009639?logo=nginx&logoColor=white)](https://nginx.org/)
+
+---
+
+## Скриншоты
+
+> Все шесть слотов сейчас показывают [placeholder.svg](docs/screenshots/placeholder.svg).
+> Положите реальные PNG-снимки в `docs/screenshots/` под именами
+> `profile.png`, `news.png`, `messages.png`, `audio.png`, `photos.png`,
+> `graffiti.png` и поправьте пути в таблицах ниже.
+
+| Профиль | Лента новостей |
+| --- | --- |
+| ![Профиль](docs/screenshots/placeholder.svg) | ![Лента](docs/screenshots/placeholder.svg) |
+
+| Сообщения и групповые чаты | Аудио-плеер в шапке |
+| --- | --- |
+| ![Сообщения](docs/screenshots/placeholder.svg) | ![Плеер](docs/screenshots/placeholder.svg) |
+
+| Фотоальбомы | Граффити на стене |
+| --- | --- |
+| ![Фото](docs/screenshots/placeholder.svg) | ![Граффити](docs/screenshots/placeholder.svg) |
+
+---
 
 ## Возможности
 
-- Аутентификация (email + пароль, кастомная `User` модель)
-- Профиль: аватар, дата рождения, семейное положение, родной город, образование,
-  политические/религиозные взгляды, Skype/ICQ, любимая музыка/фильмы/ТВ/игры/книги
-  /цитаты, шкала заполненности
-- Друзья: заявки, поиск с пагинацией, case-insensitive по кириллице, индикатор онлайн
-- Фото: альбомы, мульти-загрузка, отметки друзей, комментарии
-- Аудио: загрузка, поиск, личная коллекция, ретро-плеер в шапке (играет при навигации)
-- Видео: загрузка с превью, перемотка через HTTP Range
-- Стена: текстовые посты, комментарии, граффити (canvas в модалке)
-- Группы: создание, вступление, отдельная стена, поиск
-- Лента новостей: посты друзей и групп
-- Сообщения: 1-к-1 диалоги, инбокс с непрочитанными
-- 8 настроек приватности
+- **Аутентификация** — email + пароль, кастомная `User` модель.
+- **Профиль** — аватар, дата рождения, семейное положение, родной город,
+  образование, политические/религиозные взгляды, Skype/ICQ/сайт, любимая
+  музыка/фильмы/ТВ/игры/книги/цитаты, шкала заполненности профиля.
+- **Друзья** — заявки, поиск с пагинацией (case-insensitive по кириллице),
+  индикатор «онлайн» и «был в сети N минут назад».
+- **Фото** — альбомы, мульти-загрузка, отметки друзей, комментарии.
+- **Аудио** — загрузка, поиск, личная коллекция, ретро-плеер в шапке
+  (продолжает играть при навигации, prev/next, прогресс-бар, статус
+  «сейчас слушает X» в профиле).
+- **Видео** — загрузка с превью, перемотка через HTTP Range.
+- **Стена** — текстовые посты, комментарии, граффити (canvas в модалке).
+- **Группы** — создание, вступление, отдельная стена, поиск.
+- **Лента новостей** — посты друзей и групп, счётчик новых постов
+  с момента последнего захода.
+- **Сообщения** — 1-к-1 диалоги и групповые чаты с управлением
+  участниками, прикрепление картинок, пагинация (20/стр.), inbox с
+  непрочитанными.
+- **Уведомления** — звук на новое сообщение и заявку в друзья,
+  бейджи `(N)` в сайдбаре и в `<title>` вкладки, опрос каждые 10 секунд.
+- **Приватность** — 8 настраиваемых аудиторий (всё / только друзья /
+  только я) для профиля, стены, фото, аудио, видео, групп, сообщений.
+
+---
 
 ## Локальная разработка
 
@@ -38,7 +76,7 @@ python3 -m venv .venv
 
 Откройте <http://127.0.0.1:8000>, войдите как `pavel@dvorik.local` / `demo1234`.
 
-По умолчанию используется SQLite и in-memory кэш. Для Postgres + Redis локально:
+По умолчанию — SQLite и in-memory кэш. Для Postgres + Redis локально:
 
 ```bash
 docker compose up -d db redis
@@ -48,27 +86,30 @@ REDIS_URL=redis://localhost:6379/0
 EOF
 ```
 
-## Production-стек (docker compose)
+---
+
+## Production-стек
 
 ```
 [Internet] → nginx :80 → gunicorn web:8000 → postgres db:5432
-                ↓                          → redis:6379 (cache + sessions)
+                ↓                          → redis:6379  (cache + sessions)
               /static/ (volume)
               /media/  (volume, Range-aware)
 ```
 
 Что внутри:
 
-- **nginx** — gzip, per-IP rate limit (5/мин на /accounts/login|register/, 2/с
-  на write-эндпоинты, 20/с на остальное), 30-дневный кэш `/static/`,
+- **nginx** — gzip, per-IP rate limit (5/мин на `/accounts/login|register/`,
+  2/с на write-эндпоинты, 20/с на остальное), 30-дневный кэш `/static/`,
   HTTP Range на `/media/`, security headers.
-- **gunicorn** — `gthread` воркеры, 4 workers × 4 threads (env-настраиваемо),
-  `--max-requests 1000` для защиты от утечек, `--worker-tmp-dir /dev/shm`.
+- **gunicorn** — `gthread` воркеры, `4 workers × 4 threads`
+  (env-настраиваемо), `--max-requests 1000` для защиты от утечек,
+  `--worker-tmp-dir /dev/shm`.
 - **redis** — кэш Django + `cached_db` сессии, `maxmemory 256mb` с
   `allkeys-lru`.
 - **postgres** — `conn_max_age=600`, `conn_health_checks=True`.
-- **healthchecks** — `/healthz/` пингует БД, docker-compose ждёт DB+Redis
-  готовности перед стартом web.
+- **healthchecks** — `/healthz/` пингует БД, docker-compose ждёт
+  готовности DB+Redis перед стартом web.
 - **Sentry** (опционально, через `SENTRY_DSN`).
 - **SMTP** (опционально, через `EMAIL_HOST/USER/PASSWORD`).
 
@@ -95,22 +136,24 @@ INSECURE_HTTP=1
 CSRF_TRUSTED_ORIGINS=http://1.2.3.4
 ```
 
-Это снимет `Secure`-флаги c кук и HSTS. **Обязательно вернуть `INSECURE_HTTP=0`
-после поднятия HTTPS.**
+Это снимет `Secure`-флаги c кук и HSTS. **Обязательно вернуть
+`INSECURE_HTTP=0` после поднятия HTTPS.**
 
 Для прода:
-- Поставьте перед нашим nginx ещё один прокси с TLS (Caddy / Traefik /
-  Cloudflare Tunnel) — самый простой путь, бесплатные сертификаты.
-- Или допишите `server { listen 443 ssl; … }` в [nginx.conf](nginx.conf)
-  и смонтируйте сертификаты от Let's Encrypt.
+
+- Поставить перед нашим nginx ещё один прокси с TLS
+  (Caddy / Traefik / Cloudflare Tunnel) — самый простой путь,
+  бесплатные сертификаты.
+- Или дописать `server { listen 443 ssl; … }` в [nginx.conf](nginx.conf)
+  и смонтировать сертификаты от Let's Encrypt.
 
 Django уже трастит `X-Forwarded-Proto`, ставит `Secure`-куки и HSTS
 при `DEBUG=0`.
 
 ### Бэкапы
 
-[scripts/backup.sh](scripts/backup.sh) делает gzip-дамп Postgres и tar
-медиа-папки. Подключите в cron:
+[scripts/backup.sh](scripts/backup.sh) делает gzip-дамп Postgres
+и tar медиа-папки. В cron:
 
 ```cron
 0 3 * * *  cd /opt/dvorik && ./scripts/backup.sh >> /var/log/dvorik-backup.log 2>&1
@@ -118,9 +161,12 @@ Django уже трастит `X-Forwarded-Proto`, ставит `Secure`-куки
 
 Хранит последние 14 дней, удаляет старее.
 
+---
+
 ## Масштабирование до ~100 000 пользователей
 
 Реалистичная нагрузка на 100k registered:
+
 - DAU ≈ 10–15k, peak concurrent ≈ 1–2k, peak RPS ≈ 200–500.
 - Медиа: 200–800 ГБ суммарно (фото + аудио + видео).
 
@@ -129,27 +175,25 @@ Django уже трастит `X-Forwarded-Proto`, ставит `Secure`-куки
 | Что | Значение |
 | --- | --- |
 | Web | gunicorn 4w×4t = 16 параллельных запросов на 4 vCPU |
-| DB  | Postgres 16, `shared_buffers 4GB`, `effective_cache_size 12GB` (тюнинг отдельно) |
+| DB  | Postgres 16, `shared_buffers 4GB`, `effective_cache_size 12GB` |
 | Cache | Redis 256 MB, LRU |
-| Диск | 200 GB локально для горячих данных, остальное на S3-совместимое объектное хранилище |
-| Сеть | 1 Gbit/s исходящего вполне хватит |
+| Диск | 200 GB локально для горячих данных, остальное — S3 |
+| Сеть | 1 Gbit/s исходящего |
 
 ### Что докрутить, когда упрёмся
 
 1. **Медиа на объектное хранилище** (Hetzner Object Storage / Backblaze B2 /
    Cloudflare R2) через `django-storages[s3]`. Отдавать через CDN
-   (Cloudflare даёт бесплатный egress). Локальный диск перестанет быть
-   bottleneck.
-2. **Postgres connection pooling** — добавить контейнер `pgbouncer` между
-   web и db, режим `transaction`. Особенно если будет много воркеров.
-3. **Celery + Redis** для асинхронных задач (генерация thumbnail на upload,
+   (Cloudflare даёт бесплатный egress).
+2. **Postgres connection pooling** — добавить `pgbouncer` между web и db,
+   режим `transaction`.
+3. **Celery + Redis** для асинхронных задач (генерация thumbnail,
    отправка email). Добавится сервис `worker`.
 4. **CDN перед nginx** — Cloudflare/Bunny отдадут `/static/` и `/media/`
-   из edge-кэша, остальное проксируют. Снимет ~70% трафика с VPS.
+   из edge-кэша. Снимет ~70% трафика с VPS.
 5. **Read replica** Postgres для тяжёлых выборок (лента, поиск).
-6. **Горизонтальное масштабирование web** — поднять второй `web` контейнер,
-   nginx уже знает про upstream-балансировку (`upstream django { server web:8000; }` →
-   добавить `server web2:8000`).
+6. **Горизонтальное масштабирование web** — поднять второй `web`
+   контейнер, nginx уже знает про upstream-балансировку.
 
 ### Где хостить (не в РФ)
 
@@ -164,39 +208,47 @@ Django уже трастит `X-Forwarded-Proto`, ставит `Secure`-куки
 
 **Рекомендация — Hetzner.** Лучшее соотношение цена / производительность,
 EU-юрисдикция, входящий трафик бесплатный, пиринг с Cloudflare стабилен.
-Добавьте Hetzner Object Storage или Backblaze B2 (~€5 / $6 за 1 ТБ) для
-медиа и Cloudflare (бесплатный план) перед сайтом — DDoS-фильтр + CDN +
-TLS из коробки.
-
 Минимальный production-конфиг под 100k активных:
 
 ```
-Hetzner CCX23  (€30/мес)        — все контейнеры стека
+Hetzner CCX23  (€30/мес)         — все контейнеры стека
 Hetzner Object Storage (~€5/мес) — фото/аудио/видео
-Cloudflare Free                 — CDN + TLS + WAF
+Cloudflare Free                  — CDN + TLS + WAF
                             ───────────────────
                             Итого ≈ €35/мес
 ```
 
-При росте до ~500k активных — выносим Postgres на отдельный CCX23,
-поднимаем второй web-нод за тем же nginx, переключаем медиа на R2.
+При росте до ~500k — выносим Postgres на отдельный CCX23, поднимаем
+второй web-нод за тем же nginx, переключаем медиа на R2.
+
+---
 
 ## Структура
 
 ```
-dvorik/      — Django-проект (settings, urls, range-aware dev media, Cyrillic LOWER, /healthz/)
+dvorik/      — Django-проект (settings, urls, range-aware dev media,
+               Cyrillic LOWER, /healthz/)
 accounts/    — кастомный User
-profiles/    — Profile, приватность, last_seen middleware
+profiles/    — Profile, приватность, last_seen middleware,
+               news_seen_at для счётчика новостей
 friends/     — Friendship, заявки, поиск
 wall/        — WallPost, граффити, generic-target (user или group)
-messaging/   — Dialog, Message
+messaging/   — Dialog (M2M-участники), Message с прикреплением картинок,
+               групповые чаты, пагинация
 photos/      — Album, Photo, PhotoTag, PhotoComment
-audio/       — AudioTrack + UserAudio
-video/       — Video с превью
+audio/       — AudioTrack + UserAudio, ретро-плеер в шапке
+video/       — Video с превью, HTTP-Range
 groups/      — Group + GroupMember
 feed/        — лента новостей
-templates/   — Django-шаблоны, base.html с шапкой, сайдбаром, плеером, модалкой
-static/      — CSS / JS / placeholder-картинки
-scripts/backup.sh — cron-friendly бэкап Postgres + media
-Dockerfile, docker-compose.yml, nginx.conf, proxy.inc — production-стек
+templates/   — Django-шаблоны: base.html с шапкой/сайдбаром/плеером/
+               модалкой; HTMX boost + опрос для нотификаций
+static/      — CSS / JS / звуки уведомлений / placeholder-картинки
+scripts/     — backup.sh, deploy.sh
+Dockerfile, docker-compose.yml, nginx.conf, proxy.inc
 ```
+
+---
+
+## Лицензия
+
+MIT.

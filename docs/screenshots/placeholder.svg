@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid meet">
+  <rect width="800" height="500" fill="#EDEFF3"/>
+  <rect x="0" y="0" width="800" height="60" fill="#45668E"/>
+  <text x="20" y="38" font-family="Tahoma, Verdana, sans-serif" font-size="22" fill="#fff" font-weight="bold">Дворик</text>
+  <rect x="0" y="60" width="180" height="440" fill="#fff" stroke="#D3DBE6" stroke-width="1"/>
+  <rect x="200" y="80" width="580" height="400" fill="#fff" stroke="#D3DBE6" stroke-width="1"/>
+  <text x="400" y="260" text-anchor="middle" font-family="Tahoma, Verdana, sans-serif" font-size="28" fill="#7B8AA1" font-weight="bold">скриншот скоро</text>
+  <text x="400" y="295" text-anchor="middle" font-family="Tahoma, Verdana, sans-serif" font-size="14" fill="#9AAAC0">положите файл в docs/screenshots/</text>
+</svg>
