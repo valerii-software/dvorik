@@ -22,8 +22,9 @@ from .permissions import visibility_flags
 User = get_user_model()
 
 
-@login_required
 def my_page(request):
+    if not request.user.is_authenticated:
+        return redirect('accounts:register')
     return redirect('profiles:view', user_id=request.user.id)
 
 
