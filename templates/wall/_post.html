@@ -11,7 +11,7 @@
     {% if p.image %}
       <div class="wall-image"><a href="{{ p.image.url }}" target="_blank"><img src="{{ p.image.url }}" alt=""></a></div>
     {% endif %}
-    {% if p.text %}<div class="text">{{ p.text|linebreaksbr }}</div>{% endif %}
+    {% if p.text %}<div class="text">{{ p.text|urlize|linebreaksbr }}</div>{% endif %}
     <div class="meta">
       {{ p.created_at|date:"j E Y, H:i" }}
       {% if p.author_id == request.user.id or p.owner_id == request.user.id or p.group and p.group.owner_id == request.user.id %}
