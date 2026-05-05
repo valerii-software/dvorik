@@ -25,11 +25,10 @@ EXPOSE 8000
 CMD ["sh", "-c", "\
     python manage.py collectstatic --noinput && \
     python manage.py migrate --noinput && \
-    exec gunicorn dvorik.wsgi:application \
+    exec gunicorn dvorik.asgi:application \
         --bind 0.0.0.0:8000 \
         --workers ${GUNICORN_WORKERS:-4} \
-        --threads ${GUNICORN_THREADS:-4} \
-        --worker-class gthread \
+        --worker-class uvicorn.workers.UvicornWorker \
         --worker-tmp-dir /dev/shm \
         --max-requests 1000 \
         --max-requests-jitter 100 \

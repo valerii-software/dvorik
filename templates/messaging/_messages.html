@@ -1,23 +1,11 @@
 <div id="messages">
-  {% if messages_list %}
-    {% for m in messages_list %}
-      <div class="message">
-        <a href="{% url 'profiles:view' m.sender.id %}"><img class="ava" src="{{ m.sender.profile.avatar_url }}"></a>
-        <div class="body">
-          <div>
-            <a href="{% url 'profiles:view' m.sender.id %}"><b>{{ m.sender.first_name }} {{ m.sender.last_name }}</b></a>
-            <span class="muted">— {{ m.created_at|date:"j E Y, H:i" }}</span>
-          </div>
-          {% if m.image %}
-            <div class="wall-image"><a href="{{ m.image.url }}" target="_blank"><img src="{{ m.image.url }}" alt=""></a></div>
-          {% endif %}
-          {% if m.text %}<div class="text">{{ m.text|linebreaksbr }}</div>{% endif %}
-        </div>
-      </div>
-    {% endfor %}
-  {% else %}
-    <div class="empty">Сообщений пока нет. Напишите первое!</div>
-  {% endif %}
+  <div id="messages-stream">
+    {% if messages_list %}
+      {% for m in messages_list %}{% include 'messaging/_message.html' with m=m %}{% endfor %}
+    {% else %}
+      <div class="empty">Сообщений пока нет. Напишите первое!</div>
+    {% endif %}
+  </div>
   {% if page and page.paginator.num_pages > 1 %}
     <div class="msg-pager">
       {% if page.has_previous %}<a href="?page={{ page.previous_page_number }}">← Новее</a>{% else %}<span class="disabled">← Новее</span>{% endif %}

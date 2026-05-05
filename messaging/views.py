@@ -1,15 +1,20 @@
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
+
 from django.contrib import messages as flash
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.template.loader import render_to_string
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from friends.models import Friendship
 from profiles.permissions import can_view
 
+from .consumers import chat_group
 from .models import Dialog, Message
 
 
@@ -165,18 +170,26 @@ def send(request, dialog_id):
     text = request.POST.get('text', '').strip()
     image = request.FILES.get('image')
     if text or image:
-        Message.objects.create(
+        msg = Message.objects.create(
             dialog=dialog, sender=request.user,
             text=text, image=image,
         )
         dialog.last_message_at = timezone.now()
         dialog.save(update_fields=['last_message_at'])
+        # Push the new message HTML to every WebSocket client subscribed
+        # to this dialog (including the sender — keeps the bubble in
+        # sync with what other clients see).
+        rendered = render_to_string('messaging/_message.html', {'m': msg}, request=request)
+        oob = (
+            f'<div id="messages-stream" hx-swap-oob="beforeend:#messages-stream">'
+            f'{rendered}</div>'
+        )
+        async_to_sync(get_channel_layer().group_send)(
+            chat_group(dialog.id),
+            {'type': 'chat_message', 'html': oob},
+        )
     if request.headers.get('HX-Request'):
-        msgs, page, page_range = _paginate_messages(dialog, 1)
-        return render(request, 'messaging/_messages.html', {
-            'messages_list': msgs, 'dialog': dialog, 'page': page,
-            'page_range': page_range, 'ellipsis': Paginator.ELLIPSIS,
-        })
+        return HttpResponse(status=204)
     return redirect('messaging:open_chat', dialog_id=dialog.id)
 
 

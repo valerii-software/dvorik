@@ -46,19 +46,13 @@
 {% endif %}
 
 {% if not page or page.number == 1 %}
-<span hx-get="{% url 'messaging:open_chat' dialog.id %}"
-      hx-trigger="every 5s"
-      hx-target="#messages"
-      hx-swap="outerHTML"
-      hx-select="#messages"
-      style="display:none"></span>
+<div hx-ext="ws" ws-connect="/ws/chat/{{ dialog.id }}/" style="display:none"></div>
 {% endif %}
 {% include 'messaging/_messages.html' with messages_list=messages_list dialog=dialog %}
 
 <form method="post" action="{% url 'messaging:send' dialog.id %}" enctype="multipart/form-data"
       hx-post="{% url 'messaging:send' dialog.id %}"
-      hx-target="#messages" hx-swap="outerHTML"
-      hx-select="#messages"
+      hx-swap="none"
       hx-encoding="multipart/form-data"
       hx-on::after-request="this.reset()"
       style="margin-top:10px">

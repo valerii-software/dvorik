@@ -36,6 +36,7 @@ if not DEBUG and not INSECURE_HTTP:
     SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
 
 INSTALLED_APPS = [
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -113,6 +114,20 @@ else:
         'default': {
             'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         }
+    }
+
+# Channels (WebSockets). Redis layer in prod, in-memory locally.
+ASGI_APPLICATION = 'dvorik.asgi.application'
+if REDIS_URL:
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels_redis.core.RedisChannelLayer',
+            'CONFIG': {'hosts': [REDIS_URL]},
+        }
+    }
+else:
+    CHANNEL_LAYERS = {
+        'default': {'BACKEND': 'channels.layers.InMemoryChannelLayer'},
     }
 
 # Email (used for password resets etc; no-op until SMTP is configured).
