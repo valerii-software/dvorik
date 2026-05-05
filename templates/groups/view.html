@@ -51,6 +51,7 @@
 {% endif %}
 
 <h2>Стена</h2>
+<div hx-ext="ws" ws-connect="/ws/wall/group/{{ group.id }}/" style="display:none"></div>
 {% if is_member or is_owner %}
   {% include 'wall/_wall.html' with posts=posts group=group wall_form=wall_form %}
 {% else %}

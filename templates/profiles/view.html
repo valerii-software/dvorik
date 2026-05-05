@@ -211,6 +211,7 @@
 
     {% if can_view_wall %}
       <h2>Стена</h2>
+      <div hx-ext="ws" ws-connect="/ws/wall/user/{{ pageuser.id }}/" style="display:none"></div>
       {% if can_post_wall or is_me %}
         {% include 'wall/_wall.html' with posts=posts owner=pageuser wall_form=wall_form %}
       {% else %}

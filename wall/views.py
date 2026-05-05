@@ -47,7 +47,9 @@ def post(request, owner_id):
         wp.author = request.user
         wp.save()
         from messaging.consumers import push_notif_for_wall_post
+        from .consumers import push_wall
         push_notif_for_wall_post(wp)
+        push_wall(owner=owner)
     if request.headers.get('HX-Request'):
         posts = WallPost.objects.filter(owner=owner).select_related('author', 'author__profile')
         return render(request, 'wall/_posts.html', {'posts': posts, 'owner': owner})
@@ -67,7 +69,9 @@ def post_to_group(request, group_id):
         wp.author = request.user
         wp.save()
         from messaging.consumers import push_notif_for_wall_post
+        from .consumers import push_wall
         push_notif_for_wall_post(wp)
+        push_wall(group=group)
     if request.headers.get('HX-Request'):
         posts = WallPost.objects.filter(group=group).select_related('author', 'author__profile')
         return render(request, 'wall/_posts.html', {'posts': posts, 'group': group})
@@ -141,7 +145,9 @@ def save_graffiti_user(request, owner_id):
     wp = WallPost(owner=owner, author=request.user, text='')
     wp.graffiti.save(f'graffiti_{uuid.uuid4().hex}.{ext}', cf, save=True)
     from messaging.consumers import push_notif_for_wall_post
+    from .consumers import push_wall
     push_notif_for_wall_post(wp)
+    push_wall(owner=owner)
     return redirect('profiles:view', user_id=owner_id)
 
 
@@ -158,7 +164,9 @@ def save_graffiti_group(request, group_id):
     wp = WallPost(group=group, author=request.user, text='')
     wp.graffiti.save(f'graffiti_{uuid.uuid4().hex}.{ext}', cf, save=True)
     from messaging.consumers import push_notif_for_wall_post
+    from .consumers import push_wall
     push_notif_for_wall_post(wp)
+    push_wall(group=group)
     return redirect('groups:view', group_id=group_id)
 
 

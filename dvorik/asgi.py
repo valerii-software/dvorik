@@ -10,10 +10,14 @@ from channels.auth import AuthMiddlewareStack  # noqa: E402
 from channels.routing import ProtocolTypeRouter, URLRouter  # noqa: E402
 
 import messaging.routing  # noqa: E402
+import wall.routing  # noqa: E402
 
 application = ProtocolTypeRouter({
     'http': django_asgi_app,
     'websocket': AuthMiddlewareStack(
-        URLRouter(messaging.routing.websocket_urlpatterns),
+        URLRouter(
+            messaging.routing.websocket_urlpatterns
+            + wall.routing.websocket_urlpatterns
+        ),
     ),
 })

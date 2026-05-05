@@ -8,9 +8,9 @@
 <div class="wall-form">
   <form method="post" action="{{ post_url }}" enctype="multipart/form-data"
         hx-post="{{ post_url }}"
-        hx-target="#wall-posts" hx-swap="outerHTML"
-        hx-select="#wall-posts"
-        hx-encoding="multipart/form-data">
+        hx-swap="none"
+        hx-encoding="multipart/form-data"
+        hx-on::after-request="this.reset()">
     {% csrf_token %}
     {{ wall_form.text }}
     <div style="margin-top:4px; display:flex; align-items:center; gap:8px;">

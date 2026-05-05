@@ -1,5 +1,5 @@
 {% load wall_extras %}
-<div id="wall-posts">
+<div id="wall-posts"{% if oob %} hx-swap-oob="outerHTML"{% endif %}>
   {% if posts %}
     {% for p in posts %}
       {% include 'wall/_post.html' with p=p owner=owner %}
