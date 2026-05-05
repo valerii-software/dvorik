@@ -37,10 +37,12 @@
         </form>
       {% elif is_member %}
         <details class="sub-status">
-          <summary>Вы подписаны</summary>
-          <form method="post" action="{% url 'groups:leave' group.id %}" style="margin-top:4px">
-            {% csrf_token %}<button class="link-btn" type="submit">отписаться</button>
-          </form>
+          <summary>Вы подписаны<span class="caret"></span></summary>
+          <div class="sub-menu">
+            <form method="post" action="{% url 'groups:leave' group.id %}">
+              {% csrf_token %}<button type="submit">отписаться</button>
+            </form>
+          </div>
         </details>
       {% else %}
         <form method="post" action="{% url 'groups:join' group.id %}" style="display:block; margin-top:6px">

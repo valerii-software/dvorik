@@ -1002,18 +1002,58 @@ canvas#graffiti {
   gap: 4px;
 }
 .aside-actions .btn { text-align: center; }
+.sub-status {
+  position: relative;
+}
 .sub-status > summary {
   list-style: none;
   cursor: pointer;
-  padding: 3px 6px;
+  padding: 3px 8px;
   background: #ECF0F5;
   border: 1px solid #B2BCCC;
   border-radius: 2px;
   text-align: center;
+  user-select: none;
 }
 .sub-status > summary::-webkit-details-marker { display: none; }
-.sub-status > summary::after { content: ' ▾'; color: #6B7B8E; }
-.sub-status[open] > summary::after { content: ' ▴'; }
+.sub-status > summary .caret {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin-left: 6px;
+  border-right: 1px solid #6B7B8E;
+  border-bottom: 1px solid #6B7B8E;
+  transform: rotate(45deg) translate(-1px, -1px);
+}
+.sub-status[open] > summary .caret {
+  transform: rotate(-135deg) translate(-1px, -1px);
+}
+.sub-menu {
+  position: absolute;
+  top: calc(100% + 1px);
+  left: 0;
+  right: 0;
+  background: #FFFFFF;
+  border: 1px solid #B2BCCC;
+  border-radius: 2px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  z-index: 5;
+}
+.sub-menu form { margin: 0; }
+.sub-menu button {
+  display: block;
+  width: 100%;
+  padding: 5px 8px;
+  background: transparent;
+  border: 0;
+  text-align: left;
+  cursor: pointer;
+  color: #2B587A;
+  font: inherit;
+}
+.sub-menu button:hover {
+  background: #ECF0F5;
+}
 
 /* Blue header / grey subhead block — meant to be reused across the app
    later, but for now restricted to the group sidebar via .group-aside. */
