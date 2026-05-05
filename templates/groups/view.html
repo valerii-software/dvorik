@@ -32,9 +32,14 @@
 
       {% if is_owner %}
         <a class="btn" href="{% url 'groups:edit_group' group.id %}">редактировать</a>
-        <form method="post" action="{% url 'groups:delete_group' group.id %}" style="display:block; margin-top:2px">
-          {% csrf_token %}<button class="btn" type="submit">удалить группу</button>
-        </form>
+        <details class="sub-status">
+          <summary>Вы подписаны<span class="caret"></span></summary>
+          <div class="sub-menu">
+            <form method="post" action="{% url 'groups:delete_group' group.id %}">
+              {% csrf_token %}<button type="submit">удалить группу</button>
+            </form>
+          </div>
+        </details>
       {% elif is_member %}
         <details class="sub-status">
           <summary>Вы подписаны<span class="caret"></span></summary>
