@@ -10,7 +10,7 @@
     <div class="profile-actions">
       {% if is_owner %}
         <a href="{% url 'groups:edit_group' group.id %}">редактировать</a>
-        <form method="post" action="{% url 'groups:delete_group' group.id %}" style="display:block; margin-top:2px" hx-confirm="Удалить группу?">
+        <form method="post" action="{% url 'groups:delete_group' group.id %}" style="display:block; margin-top:2px">
           {% csrf_token %}<button class="btn" type="submit">удалить группу</button>
         </form>
       {% elif is_member %}

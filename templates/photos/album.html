@@ -13,7 +13,7 @@
   <div style="margin-bottom:10px">
     <a class="btn btn-primary" href="{% url 'photos:upload' album.id %}">Загрузить фотографии</a>
     &nbsp;<a class="btn" href="{% url 'photos:edit_album' album.id %}">Редактировать альбом</a>
-    &nbsp;<form method="post" action="{% url 'photos:delete_album' album.id %}" style="display:inline" hx-confirm="Удалить альбом?">
+    &nbsp;<form method="post" action="{% url 'photos:delete_album' album.id %}" style="display:inline">
       {% csrf_token %}<button class="btn" type="submit">Удалить альбом</button>
     </form>
   </div>

@@ -16,7 +16,7 @@
       {{ p.created_at|date:"j E Y, H:i" }}
       {% if p.author_id == request.user.id or p.owner_id == request.user.id or p.group and p.group.owner_id == request.user.id %}
         &nbsp;·&nbsp;
-        <form hx-post="{% url 'wall:delete' p.id %}" hx-confirm="Удалить пост?" hx-swap="none" style="display:inline">
+        <form hx-post="{% url 'wall:delete' p.id %}" hx-swap="none" style="display:inline">
           <button class="btn" style="padding:0 4px; font-size:10px" type="submit">удалить</button>
         </form>
       {% endif %}

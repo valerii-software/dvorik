@@ -15,14 +15,14 @@
           <span>{{ m.first_name }} {{ m.last_name }}</span>
         </a>
         {% if is_creator and m.id != request.user.id %}
-          <form method="post" action="{% url 'messaging:remove_member' dialog.id m.id %}" style="display:inline" hx-confirm="Удалить {{ m.get_full_name }} из чата?">
+          <form method="post" action="{% url 'messaging:remove_member' dialog.id m.id %}" style="display:inline">
             {% csrf_token %}<button class="link-btn" type="submit" title="Удалить из чата">×</button>
           </form>
         {% endif %}
       </span>
     {% endfor %}
     {% if request.user in members %}
-      <form method="post" action="{% url 'messaging:leave_chat' dialog.id %}" style="display:inline-block; margin-left:8px" hx-confirm="Покинуть чат?">
+      <form method="post" action="{% url 'messaging:leave_chat' dialog.id %}" style="display:inline-block; margin-left:8px">
         {% csrf_token %}<button class="link-btn" type="submit">покинуть</button>
       </form>
     {% endif %}
