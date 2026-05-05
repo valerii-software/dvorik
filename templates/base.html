@@ -8,6 +8,24 @@
   <link rel="stylesheet" href="{% static 'css/dvorik.css' %}">
   <script src="https://unpkg.com/htmx.org@1.9.12"></script>
   <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/ws.js"></script>
+  <script>
+    // Pull csrftoken from the cookie on every HTMX request — covers the
+    // case where the form was rendered server-side without `request` in
+    // the template context (WebSocket pushes), so the embedded
+    // csrfmiddlewaretoken hidden input is empty.
+    (function () {
+      function getCookie(name) {
+        const m = document.cookie.match('(^|;)\\s*' + name + '=([^;]*)');
+        return m ? decodeURIComponent(m[2]) : '';
+      }
+      // document.body isn't there yet from <head>; htmx events bubble
+      // to document, so listen there.
+      document.addEventListener('htmx:configRequest', function (ev) {
+        const tok = getCookie('csrftoken');
+        if (tok) ev.detail.headers['X-CSRFToken'] = tok;
+      });
+    })();
+  </script>
   <script src="{% static 'js/audio_player.js' %}" defer></script>
   {% if user.is_authenticated %}
     <script>

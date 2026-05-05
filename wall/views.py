@@ -85,7 +85,13 @@ def delete_post(request, post_id):
     if not _can_delete(request.user, wp):
         return _redirect_to_target(wp)
     response = _redirect_to_target(wp)
+    owner, group = wp.owner, wp.group
     wp.delete()
+    from .consumers import push_wall
+    if owner is not None:
+        push_wall(owner=owner)
+    elif group is not None:
+        push_wall(group=group)
     return response
 
 
