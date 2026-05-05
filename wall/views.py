@@ -188,6 +188,39 @@ def comment(request, post_id):
         c.post = wp
         c.author = request.user
         c.save()
+        from .consumers import push_wall
+        if wp.owner_id:
+            push_wall(owner=wp.owner)
+        elif wp.group_id:
+            push_wall(group=wp.group)
     if request.headers.get('HX-Request'):
         return render(request, 'wall/_post.html', {'p': wp})
+    return _redirect_to_target(wp)
+
+
+def _can_delete_comment(user, c):
+    wp = c.post
+    return (
+        c.author_id == user.id
+        or wp.author_id == user.id
+        or wp.owner_id == user.id
+        or (wp.group_id and wp.group.owner_id == user.id)
+    )
+
+
+@login_required
+@require_POST
+def delete_comment(request, comment_id):
+    from .models import WallComment
+    c = get_object_or_404(WallComment, pk=comment_id)
+    wp = c.post
+    if not _can_delete_comment(request.user, c):
+        return _redirect_to_target(wp)
+    owner, group = wp.owner, wp.group
+    c.delete()
+    from .consumers import push_wall
+    if owner is not None:
+        push_wall(owner=owner)
+    elif group is not None:
+        push_wall(group=group)
     return _redirect_to_target(wp)

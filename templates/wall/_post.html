@@ -28,7 +28,15 @@
         <div>
           <a href="{% url 'profiles:view' c.author.id %}"><b>{{ c.author.first_name }} {{ c.author.last_name }}</b></a>
           <div class="text">{{ c.text|linebreaksbr }}</div>
-          <div class="meta">{{ c.created_at|date:"j E Y, H:i" }}</div>
+          <div class="meta">
+            {{ c.created_at|date:"j E Y, H:i" }}
+            {% if c.author_id == request.user.id or p.author_id == request.user.id or p.owner_id == request.user.id or p.group and p.group.owner_id == request.user.id %}
+              &nbsp;·&nbsp;
+              <form hx-post="{% url 'wall:delete_comment' c.id %}" hx-swap="none" style="display:inline">
+                <button class="link-btn" style="font-size:10px" type="submit">удалить</button>
+              </form>
+            {% endif %}
+          </div>
         </div>
       </div>
     {% endfor %}
