@@ -14,7 +14,7 @@ from django.views.decorators.http import require_POST
 from friends.models import Friendship
 from profiles.permissions import can_view
 
-from .consumers import chat_group
+from .consumers import chat_group, push_notif
 from .models import Dialog, Message
 
 
@@ -188,6 +188,9 @@ def send(request, dialog_id):
             chat_group(dialog.id),
             {'type': 'chat_message', 'html': oob},
         )
+        # Update inbox/sidebar counters for everyone except the sender.
+        for participant_id in dialog.participants.exclude(id=request.user.id).values_list('id', flat=True):
+            push_notif(participant_id)
     if request.headers.get('HX-Request'):
         return HttpResponse(status=204)
     return redirect('messaging:open_chat', dialog_id=dialog.id)

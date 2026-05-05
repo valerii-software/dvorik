@@ -1,6 +1,8 @@
-/* Periodically asks the server for the unread message count.
- * Plays a notification sound when the count goes up, and prefixes
- * document.title with "(N) " so the tab badge nudges the user.
+/* Live notification counters via WebSocket.
+ * Connects to /ws/notif/ — server pushes {messages, requests, news}
+ * snapshots whenever any of those change. Plays a sound when messages
+ * or friend-requests go up, prefixes document.title with "(N) ", and
+ * updates [data-counter="messages"|"requests"|"news"] sidebar badges.
  *
  * Only runs for authenticated users (the {% if %} in base.html guards
  * the bootstrap window.__DVORIK_NOTIF__).
@@ -40,39 +42,39 @@
     });
   }
 
-  function poll() {
-    if (document.visibilityState !== 'visible') return;
-    fetch(cfg.url, { credentials: 'same-origin', cache: 'no-store' })
-      .then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (data) {
-        if (!data) return;
-        const messages = (data.messages != null ? data.messages : data.count) | 0;
-        const requests = (data.requests || 0) | 0;
-        const news = (data.news || 0) | 0;
-        if (lastMessages !== null && messages > lastMessages) {
-          // count went up — play sound (best-effort, may be blocked
-          // until first user gesture).
-          try { audio.currentTime = 0; audio.play().catch(() => {}); } catch (e) {}
-        }
-        if (lastRequests !== null && requests > lastRequests && requestAudio) {
-          try { requestAudio.currentTime = 0; requestAudio.play().catch(() => {}); } catch (e) {}
-        }
-        lastMessages = messages;
-        lastRequests = requests;
-        syncTitle(messages);
-        syncCounter('messages', messages);
-        syncCounter('requests', requests);
-        syncCounter('news', news);
-      })
-      .catch(function () {});
+  function applySnapshot(data) {
+    const messages = (data.messages || 0) | 0;
+    const requests = (data.requests || 0) | 0;
+    const news = (data.news || 0) | 0;
+    if (lastMessages !== null && messages > lastMessages) {
+      try { audio.currentTime = 0; audio.play().catch(() => {}); } catch (e) {}
+    }
+    if (lastRequests !== null && requests > lastRequests && requestAudio) {
+      try { requestAudio.currentTime = 0; requestAudio.play().catch(() => {}); } catch (e) {}
+    }
+    lastMessages = messages;
+    lastRequests = requests;
+    syncTitle(messages);
+    syncCounter('messages', messages);
+    syncCounter('requests', requests);
+    syncCounter('news', news);
   }
 
-  // Initial fire so we capture the baseline + show the badge on load.
-  poll();
-  setInterval(poll, 10000);
-
-  // Refire when the tab regains focus so we don't wait up to 10s.
-  document.addEventListener('visibilitychange', function () {
-    if (document.visibilityState === 'visible') poll();
-  });
+  let ws = null;
+  let backoff = 1000;  // ms; doubles each failed reconnect, capped at 30s
+  function connect() {
+    const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+    ws = new WebSocket(proto + '//' + location.host + '/ws/notif/');
+    ws.onopen = function () { backoff = 1000; };
+    ws.onmessage = function (ev) {
+      try { applySnapshot(JSON.parse(ev.data)); } catch (e) {}
+    };
+    ws.onclose = function () {
+      ws = null;
+      setTimeout(connect, backoff);
+      backoff = Math.min(backoff * 2, 30000);
+    };
+    ws.onerror = function () { try { ws.close(); } catch (e) {} };
+  }
+  connect();
 })();

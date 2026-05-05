@@ -91,9 +91,14 @@ def add(request, user_id):
             existing.accepted_at = timezone.now()
             existing.save()
             messages.success(request, f'Вы стали друзьями с {other.first_name}.')
+            from messaging.consumers import push_notif
+            push_notif(request.user.id)
+            push_notif(other.id)
     else:
         Friendship.objects.create(from_user=request.user, to_user=other)
         messages.success(request, f'Заявка отправлена пользователю {other.first_name}.')
+        from messaging.consumers import push_notif
+        push_notif(other.id)
     return redirect('profiles:view', user_id=user_id)
 
 
@@ -103,6 +108,8 @@ def cancel(request, user_id):
     Friendship.objects.filter(
         from_user=request.user, to_user_id=user_id, status=Friendship.PENDING
     ).delete()
+    from messaging.consumers import push_notif
+    push_notif(user_id)  # the recipient's pending counter just dropped
     return redirect('profiles:view', user_id=user_id)
 
 
@@ -114,6 +121,8 @@ def accept(request, user_id):
     f.accepted_at = timezone.now()
     f.save()
     messages.success(request, 'Заявка принята.')
+    from messaging.consumers import push_notif
+    push_notif(request.user.id)
     return redirect('friends:requests')
 
 
@@ -123,6 +132,8 @@ def reject(request, user_id):
     Friendship.objects.filter(
         from_user_id=user_id, to_user=request.user, status=Friendship.PENDING
     ).delete()
+    from messaging.consumers import push_notif
+    push_notif(request.user.id)
     return redirect('friends:requests')
 
 
