@@ -1,0 +1,32 @@
+<div id="inbox-rows"{% if oob %} hx-swap-oob="outerHTML"{% endif %}>
+  <div style="margin-bottom:10px">
+    <a class="btn btn-primary" href="{% url 'messaging:create_group' %}">Создать чат</a>
+  </div>
+
+  {% if rows %}
+    <div class="dialog-list">
+      {% for r in rows %}
+        <a href="{% url 'messaging:open_chat' r.dialog.id %}" style="display:block; color:inherit; text-decoration:none">
+          <div class="dialog-row {% if r.unread %}unread{% endif %}">
+            <img class="ava" src="{{ r.avatar }}">
+            <div class="body">
+              <div>
+                {% if r.is_group %}<span class="muted" style="font-size:10px">[чат]</span>{% endif %}
+                {{ r.title }}
+                {% if r.is_group %}<span class="muted" style="font-size:10px">· {{ r.dialog.participants.count }} участников</span>{% endif %}
+              </div>
+              <div class="preview">
+                {% if r.last %}
+                  {% if r.is_group and r.last.sender %}<b>{{ r.last.sender.first_name }}:</b> {% endif %}{{ r.last.text|default:"[изображение]"|truncatechars:80 }}
+                {% else %}—{% endif %}
+              </div>
+            </div>
+            {% if r.last %}<div class="muted" style="white-space:nowrap">{{ r.last.created_at|date:"j M H:i" }}</div>{% endif %}
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty">У вас пока нет переписок. Откройте чей-нибудь профиль или создайте чат.</div>
+  {% endif %}
+</div>

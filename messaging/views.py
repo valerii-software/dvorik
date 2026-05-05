@@ -14,7 +14,7 @@ from django.views.decorators.http import require_POST
 from friends.models import Friendship
 from profiles.permissions import can_view
 
-from .consumers import chat_group, push_notif
+from .consumers import chat_group, push_inbox, push_notif
 from .models import Dialog, Message
 
 
@@ -86,25 +86,36 @@ def unread_count(request):
     })
 
 
-@login_required
-def inbox(request):
-    chats = list(Dialog.for_user(request.user))
+def build_inbox_rows(user):
+    """Computes the per-user dialog list shown on /messages/.
+    Shared by the HTTP inbox view and the WebSocket push helper."""
     rows = []
-    for d in chats:
+    for d in Dialog.for_user(user):
         last = d.messages.order_by('-created_at').first()
-        unread = d.messages.filter(read=False).exclude(sender=request.user).exists() if not d.is_group else False
+        unread = (
+            d.messages.filter(read=False).exclude(sender=user).exists()
+            if not d.is_group else False
+        )
         rows.append({
             'dialog': d,
-            'title': d.title_for(request.user),
-            'avatar': d.avatar_for(request.user),
+            'title': d.title_for(user),
+            'avatar': d.avatar_for(user),
             'is_group': d.is_group,
             'last': last,
             'unread': unread,
         })
-    rows.sort(key=lambda r: r['last'].created_at if r['last'] else timezone.now(), reverse=True)
+    rows.sort(
+        key=lambda r: r['last'].created_at if r['last'] else timezone.now(),
+        reverse=True,
+    )
+    return rows
+
+
+@login_required
+def inbox(request):
     return render(request, 'messaging/inbox.html', {
         'section': 'messages',
-        'rows': rows,
+        'rows': build_inbox_rows(request.user),
     })
 
 
@@ -131,7 +142,12 @@ def open_chat(request, dialog_id):
 
 
 def _render_chat(request, dialog):
-    dialog.messages.filter(read=False).exclude(sender=request.user).update(read=True)
+    marked = dialog.messages.filter(read=False).exclude(sender=request.user).update(read=True)
+    if marked:
+        # Other tabs of this user need their inbox row to lose 'unread';
+        # the sidebar counter also dropped.
+        push_inbox(request.user.id)
+        push_notif(request.user.id)
     msgs, page, page_range = _paginate_messages(dialog, request.GET.get('page', 1))
     members = list(dialog.participants.select_related('profile').all())
     is_creator = dialog.is_group and dialog.created_by_id == request.user.id
@@ -188,9 +204,14 @@ def send(request, dialog_id):
             chat_group(dialog.id),
             {'type': 'chat_message', 'html': oob},
         )
-        # Update inbox/sidebar counters for everyone except the sender.
-        for participant_id in dialog.participants.exclude(id=request.user.id).values_list('id', flat=True):
-            push_notif(participant_id)
+        # Update inbox/sidebar counters for everyone except the sender;
+        # push fresh inbox-row HTML to everyone (sender included — their
+        # last-message preview / timestamp / row order changed too).
+        all_ids = list(dialog.participants.values_list('id', flat=True))
+        for participant_id in all_ids:
+            push_inbox(participant_id)
+            if participant_id != request.user.id:
+                push_notif(participant_id)
     if request.headers.get('HX-Request'):
         return HttpResponse(status=204)
     return redirect('messaging:open_chat', dialog_id=dialog.id)
@@ -215,6 +236,8 @@ def create_group(request):
                 created_by=request.user,
             )
             dialog.participants.add(request.user, *valid_ids)
+            for uid in dialog.participants.values_list('id', flat=True):
+                push_inbox(uid)
             return redirect('messaging:open_chat', dialog_id=dialog.id)
     return render(request, 'messaging/create_group.html', {
         'section': 'messages',
@@ -231,6 +254,9 @@ def leave_chat(request, dialog_id):
     if dialog.participants.filter(pk=request.user.id).exists():
         dialog.participants.remove(request.user)
         flash.info(request, f'Вы покинули чат «{dialog.name}».')
+        push_inbox(request.user.id)
+        for uid in dialog.participants.values_list('id', flat=True):
+            push_inbox(uid)
     return redirect('messaging:inbox')
 
 
@@ -246,6 +272,8 @@ def add_members(request, dialog_id):
     if valid:
         dialog.participants.add(*valid)
         flash.success(request, f'Добавлено: {len(valid)}.')
+        for uid in dialog.participants.values_list('id', flat=True):
+            push_inbox(uid)
     return redirect('messaging:open_chat', dialog_id=dialog.id)
 
 
@@ -258,4 +286,7 @@ def remove_member(request, dialog_id, user_id):
     if user_id == request.user.id:
         return redirect('messaging:open_chat', dialog_id=dialog.id)
     dialog.participants.remove(user_id)
+    push_inbox(user_id)
+    for uid in dialog.participants.values_list('id', flat=True):
+        push_inbox(uid)
     return redirect('messaging:open_chat', dialog_id=dialog.id)

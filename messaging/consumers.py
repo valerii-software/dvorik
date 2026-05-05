@@ -23,6 +23,10 @@ def notif_group(user_id: int) -> str:
     return f'notif_{user_id}'
 
 
+def inbox_group(user_id: int) -> str:
+    return f'inbox_{user_id}'
+
+
 def get_notif_snapshot(user) -> dict:
     """Re-query all per-user counters. Cheap (3 indexed counts)."""
     from django.db.models import Q
@@ -75,6 +79,33 @@ def push_notif(user_id: int) -> None:
     async_to_sync(layer.group_send)(
         notif_group(user_id),
         {'type': 'notif_update', 'data': get_notif_snapshot(user)},
+    )
+
+
+def push_inbox(user_id: int) -> None:
+    """Re-render /messages/ rows for the user and broadcast to their
+    inbox group. Skipped if no inbox-page tab is open (the channel
+    layer just discards events with no subscribers)."""
+    from django.contrib.auth import get_user_model
+    from django.template.loader import render_to_string
+
+    from .views import build_inbox_rows
+
+    User = get_user_model()
+    try:
+        user = User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        return
+    layer = get_channel_layer()
+    if layer is None:
+        return
+    html = render_to_string(
+        'messaging/_inbox_rows.html',
+        {'rows': build_inbox_rows(user), 'oob': True},
+    )
+    async_to_sync(layer.group_send)(
+        inbox_group(user_id),
+        {'type': 'inbox_update', 'html': html},
     )
 
 
@@ -152,3 +183,23 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
     @staticmethod
     def _snapshot(user):
         return get_notif_snapshot(user)
+
+
+class InboxConsumer(AsyncWebsocketConsumer):
+    """Pushes a re-rendered #inbox-rows fragment to the open inbox page
+    whenever its dialog list might have changed."""
+    async def connect(self):
+        user = self.scope['user']
+        if not user.is_authenticated:
+            await self.close()
+            return
+        self.group = inbox_group(user.id)
+        await self.channel_layer.group_add(self.group, self.channel_name)
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        if hasattr(self, 'group'):
+            await self.channel_layer.group_discard(self.group, self.channel_name)
+
+    async def inbox_update(self, event):
+        await self.send(text_data=event['html'])

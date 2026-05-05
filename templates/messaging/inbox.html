@@ -4,43 +4,7 @@
 {% block content %}
 <h1>Мои сообщения</h1>
 
-<span hx-get="{% url 'messaging:inbox' %}"
-      hx-trigger="every 10s"
-      hx-target="#inbox-rows"
-      hx-swap="outerHTML"
-      hx-select="#inbox-rows"
-      style="display:none"></span>
+<div hx-ext="ws" ws-connect="/ws/inbox/" style="display:none"></div>
 
-<div id="inbox-rows">
-  <div style="margin-bottom:10px">
-    <a class="btn btn-primary" href="{% url 'messaging:create_group' %}">Создать чат</a>
-  </div>
-
-  {% if rows %}
-    <div class="dialog-list">
-      {% for r in rows %}
-        <a href="{% url 'messaging:open_chat' r.dialog.id %}" style="display:block; color:inherit; text-decoration:none">
-          <div class="dialog-row {% if r.unread %}unread{% endif %}">
-            <img class="ava" src="{{ r.avatar }}">
-            <div class="body">
-              <div>
-                {% if r.is_group %}<span class="muted" style="font-size:10px">[чат]</span>{% endif %}
-                {{ r.title }}
-                {% if r.is_group %}<span class="muted" style="font-size:10px">· {{ r.dialog.participants.count }} участников</span>{% endif %}
-              </div>
-              <div class="preview">
-                {% if r.last %}
-                  {% if r.is_group and r.last.sender %}<b>{{ r.last.sender.first_name }}:</b> {% endif %}{{ r.last.text|default:"[изображение]"|truncatechars:80 }}
-                {% else %}—{% endif %}
-              </div>
-            </div>
-            {% if r.last %}<div class="muted" style="white-space:nowrap">{{ r.last.created_at|date:"j M H:i" }}</div>{% endif %}
-          </div>
-        </a>
-      {% endfor %}
-    </div>
-  {% else %}
-    <div class="empty">У вас пока нет переписок. Откройте чей-нибудь профиль или создайте чат.</div>
-  {% endif %}
-</div>
+{% include 'messaging/_inbox_rows.html' with rows=rows oob=False %}
 {% endblock %}
