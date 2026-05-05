@@ -1,8 +1,8 @@
 <div class="message">
-  <a href="{% url 'profiles:view' m.sender.id %}"><img class="ava" src="{{ m.sender.profile.avatar_url }}"></a>
+  <a href="{{ m.display_url }}"><img class="ava" src="{{ m.display_avatar }}"></a>
   <div class="body">
     <div>
-      <a href="{% url 'profiles:view' m.sender.id %}"><b>{{ m.sender.first_name }} {{ m.sender.last_name }}</b></a>
+      <a href="{{ m.display_url }}"><b>{{ m.display_name }}</b></a>
       <span class="muted">— {{ m.created_at|date:"j E Y, H:i" }}</span>
     </div>
     {% if m.image %}

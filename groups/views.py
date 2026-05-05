@@ -9,8 +9,8 @@ from profiles.permissions import can_view
 from wall.forms import WallPostForm
 from wall.models import WallPost
 
-from .forms import GroupForm
-from .models import Group, GroupMember
+from .forms import GroupForm, GroupSettingsForm
+from .models import Group, GroupLink, GroupMember
 
 User = get_user_model()
 
@@ -55,13 +55,15 @@ def user_groups(request, user_id):
 def view(request, group_id):
     group = get_object_or_404(Group, pk=group_id)
     posts = WallPost.objects.filter(group=group).select_related('author', 'author__profile')
-    members = group.memberships.select_related('user', 'user__profile')[:20]
+    members_preview = group.memberships.select_related('user', 'user__profile')[:6]
+    linked_groups = [gl.linked for gl in group.outgoing_links.select_related('linked')]
     return render(request, 'groups/view.html', {
         'group': group,
         'is_member': group.is_member(request.user),
         'is_owner': group.owner_id == request.user.id,
         'posts': posts,
-        'members': members,
+        'members_preview': members_preview,
+        'linked_groups': linked_groups,
         'wall_form': WallPostForm(),
     })
 
@@ -89,12 +91,15 @@ def create_group(request):
 def edit_group(request, group_id):
     group = get_object_or_404(Group, pk=group_id, owner=request.user)
     if request.method == 'POST':
-        form = GroupForm(request.POST, request.FILES, instance=group)
+        form = GroupSettingsForm(
+            request.POST, request.FILES, instance=group, owner=request.user,
+        )
         if form.is_valid():
-            form.save()
+            instance = form.save()
+            form.save_links(instance)
             return redirect('groups:view', group_id=group.id)
     else:
-        form = GroupForm(instance=group)
+        form = GroupSettingsForm(instance=group, owner=request.user)
     return render(request, 'groups/form.html', {
         'form': form,
         'group': group,

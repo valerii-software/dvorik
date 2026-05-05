@@ -45,3 +45,21 @@ class GroupMember(models.Model):
     class Meta:
         unique_together = [('group', 'user')]
         ordering = ['joined_at']
+
+
+class GroupLink(models.Model):
+    """Recommendations the admin pins on the group's right sidebar.
+    Both ends are groups; the linked side is whatever group the admin
+    is themselves a member of."""
+    group = models.ForeignKey(
+        Group, on_delete=models.CASCADE, related_name='outgoing_links',
+    )
+    linked = models.ForeignKey(
+        Group, on_delete=models.CASCADE, related_name='incoming_links',
+    )
+    position = models.PositiveSmallIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = [('group', 'linked')]
+        ordering = ['position', 'id']

@@ -133,6 +133,20 @@ def open_dialog(request, user_id):
 
 
 @login_required
+def open_group(request, group_id):
+    """Open or create a user-to-group dialog. Routes the user to the
+    chat where they 'talk to the group' and the admin replies as the
+    group on the other side."""
+    from groups.models import Group
+    group = get_object_or_404(Group, pk=group_id)
+    if group.owner_id == request.user.id:
+        # Owner has nothing to message themselves about — bounce home.
+        return redirect('groups:view', group_id=group.id)
+    dialog = Dialog.get_or_create_user_to_group(request.user, group)
+    return _render_chat(request, dialog)
+
+
+@login_required
 def open_chat(request, dialog_id):
     """Open any chat (1-on-1 or group) by its id."""
     dialog = get_object_or_404(Dialog, pk=dialog_id)

@@ -974,3 +974,97 @@ canvas#graffiti {
   padding: 5px 8px;
   margin-bottom: 10px;
 }
+
+/* ── Group page: 2-col with right-side blocks (VK 2010-style) ── */
+.group-page {
+  display: grid;
+  grid-template-columns: 1fr 200px;
+  gap: 16px;
+}
+.group-main { min-width: 0; }
+.group-desc {
+  background: #FFFFFF;
+  border: 1px solid #DAE1E8;
+  padding: 8px 10px;
+  margin: 6px 0 14px;
+  font-size: 11px;
+}
+.group-aside { font-size: 11px; }
+.group-photo img {
+  width: 200px;
+  display: block;
+  border: 1px solid #DAE1E8;
+}
+.aside-actions {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.aside-actions .btn { text-align: center; }
+.sub-status > summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 3px 6px;
+  background: #ECF0F5;
+  border: 1px solid #B2BCCC;
+  border-radius: 2px;
+  text-align: center;
+}
+.sub-status > summary::-webkit-details-marker { display: none; }
+.sub-status > summary::after { content: ' ▾'; color: #6B7B8E; }
+.sub-status[open] > summary::after { content: ' ▴'; }
+
+/* Blue header / grey subhead block — meant to be reused across the app
+   later, but for now restricted to the group sidebar via .group-aside. */
+.group-aside .side-block {
+  margin-top: 10px;
+  border: 1px solid #DAE1E8;
+  background: #FFFFFF;
+}
+.group-aside .side-block-head {
+  background: #45668E;
+  color: #FFFFFF;
+  font-weight: bold;
+  padding: 3px 8px;
+  font-size: 11px;
+}
+.group-aside .side-block-head a { color: #FFFFFF; text-decoration: none; }
+.group-aside .side-block-head a:hover { text-decoration: underline; }
+.group-aside .side-block-subhead {
+  background: #ECF0F5;
+  color: #6B7B8E;
+  padding: 2px 8px;
+  font-size: 10px;
+  border-bottom: 1px solid #DAE1E8;
+}
+.group-aside .side-block-body { padding: 6px 8px; }
+
+.member-mini {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+}
+.member-mini a { display: block; }
+.member-mini img {
+  width: 100%;
+  display: block;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
+.link-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0;
+  border-bottom: 1px solid #F0F2F5;
+  color: #2B587A;
+}
+.link-row:last-child { border-bottom: 0; }
+.link-row img {
+  width: 28px;
+  height: 28px;
+  object-fit: cover;
+  border: 1px solid #DAE1E8;
+}

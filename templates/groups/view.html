@@ -2,60 +2,91 @@
 {% block title %}{{ group.name }} — Дворик{% endblock %}
 
 {% block content %}
-<h1>{{ group.name }}</h1>
+<div class="group-page">
+  <div class="group-main">
+    <h1>{{ group.name }}</h1>
+    {% if group.description %}
+      <div class="group-desc">{{ group.description|linebreaksbr }}</div>
+    {% endif %}
 
-<div class="profile-grid">
-  <div class="profile-photo">
-    <img src="{{ group.avatar_url }}" alt="">
-    <div class="profile-actions">
+    <h2>Стена</h2>
+    <div hx-ext="ws" ws-connect="/ws/wall/group/{{ group.id }}/" style="display:none"></div>
+    {% if is_member or is_owner %}
+      {% include 'wall/_wall.html' with posts=posts group=group wall_form=wall_form %}
+    {% else %}
+      {% include 'wall/_posts.html' with posts=posts group=group %}
+      <div class="muted" style="margin-top:6px">Чтобы писать на стену, вступите в группу.</div>
+    {% endif %}
+  </div>
+
+  <aside class="group-aside">
+    <div class="group-photo">
+      <img src="{{ group.avatar_url }}" alt="">
+    </div>
+
+    <div class="aside-actions">
+      {# Написать сообщение группе — открывает диалог с группой как собеседником. #}
+      {% if not is_owner %}
+        <a class="btn" href="{% url 'messaging:open_group' group.id %}">Написать сообщение</a>
+      {% endif %}
+
       {% if is_owner %}
-        <a href="{% url 'groups:edit_group' group.id %}">редактировать</a>
+        <a class="btn" href="{% url 'groups:edit_group' group.id %}">редактировать</a>
         <form method="post" action="{% url 'groups:delete_group' group.id %}" style="display:block; margin-top:2px">
           {% csrf_token %}<button class="btn" type="submit">удалить группу</button>
         </form>
       {% elif is_member %}
-        <span class="muted">Вы участник</span>
-        <form method="post" action="{% url 'groups:leave' group.id %}" style="display:block; margin-top:2px">
-          {% csrf_token %}<button class="btn" type="submit">покинуть</button>
-        </form>
+        <details class="sub-status">
+          <summary>Вы подписаны</summary>
+          <form method="post" action="{% url 'groups:leave' group.id %}" style="margin-top:4px">
+            {% csrf_token %}<button class="link-btn" type="submit">отписаться</button>
+          </form>
+        </details>
       {% else %}
-        <form method="post" action="{% url 'groups:join' group.id %}" style="display:block">
+        <form method="post" action="{% url 'groups:join' group.id %}" style="display:block; margin-top:6px">
           {% csrf_token %}<button class="btn btn-primary" type="submit">вступить</button>
         </form>
       {% endif %}
     </div>
-  </div>
 
-  <div class="profile-info">
-    {% if group.description %}
-      <div style="margin-bottom:8px">{{ group.description|linebreaksbr }}</div>
-    {% endif %}
-    <div class="muted">Создатель: <a href="{% url 'profiles:view' group.owner.id %}">{{ group.owner.get_full_name }}</a></div>
-    <div class="muted">Создана {{ group.created_at|date:"j E Y" }}</div>
-  </div>
-</div>
-
-<h2>Участники ({{ group.members_count }})</h2>
-{% if members %}
-  <div class="friend-grid">
-    {% for m in members %}
-      <div class="friend-card">
-        <a href="{% url 'profiles:view' m.user.id %}"><img src="{{ m.user.profile.avatar_url }}" alt=""></a>
-        <a class="name" href="{% url 'profiles:view' m.user.id %}">{{ m.user.first_name }} {{ m.user.last_name }}</a>
+    <div class="side-block">
+      <div class="side-block-head">
+        <a href="{% url 'groups:members' group.id %}">Подписчики</a>
       </div>
-    {% endfor %}
-  </div>
-  <div style="margin-top:6px"><a href="{% url 'groups:members' group.id %}">Все участники →</a></div>
-{% else %}
-  <div class="empty">Пока нет участников.</div>
-{% endif %}
+      <div class="side-block-subhead">{{ group.members_count }}</div>
+      <div class="side-block-body">
+        {% if members_preview %}
+          <div class="member-mini">
+            {% for m in members_preview %}
+              <a href="{% url 'profiles:view' m.user.id %}" title="{{ m.user.get_full_name }}">
+                <img src="{{ m.user.profile.avatar_url }}" alt="">
+              </a>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="muted small">пока никого</div>
+        {% endif %}
+      </div>
+    </div>
 
-<h2>Стена</h2>
-<div hx-ext="ws" ws-connect="/ws/wall/group/{{ group.id }}/" style="display:none"></div>
-{% if is_member or is_owner %}
-  {% include 'wall/_wall.html' with posts=posts group=group wall_form=wall_form %}
-{% else %}
-  {% include 'wall/_posts.html' with posts=posts group=group %}
-  <div class="muted" style="margin-top:6px">Чтобы писать на стену, вступите в группу.</div>
-{% endif %}
+    {% if linked_groups or is_owner %}
+      <div class="side-block">
+        <div class="side-block-head">Ссылки</div>
+        <div class="side-block-subhead">{{ linked_groups|length }}</div>
+        <div class="side-block-body">
+          {% if linked_groups %}
+            {% for lg in linked_groups %}
+              <a class="link-row" href="{% url 'groups:view' lg.id %}">
+                <img src="{{ lg.avatar_url }}" alt="">
+                <span>{{ lg.name }}</span>
+              </a>
+            {% endfor %}
+          {% else %}
+            <div class="muted small">пока пусто{% if is_owner %} — добавить можно в <a href="{% url 'groups:edit_group' group.id %}">настройках</a>{% endif %}</div>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+  </aside>
+</div>
 {% endblock %}
