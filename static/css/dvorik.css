@@ -1023,13 +1023,13 @@ canvas#graffiti {
   background: #FFFFFF;
 }
 .group-aside .side-block-head {
-  background: #45668E;
-  color: #FFFFFF;
+  background: rgb(216, 225, 232);
+  color: #2B587A;
   font-weight: bold;
   padding: 3px 8px;
   font-size: 11px;
 }
-.group-aside .side-block-head a { color: #FFFFFF; text-decoration: none; }
+.group-aside .side-block-head a { color: #2B587A; text-decoration: none; }
 .group-aside .side-block-head a:hover { text-decoration: underline; }
 .group-aside .side-block-subhead {
   background: #ECF0F5;
